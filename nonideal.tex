@@ -462,10 +462,8 @@ and
 h = Y^T h^{id} + ( T \left . \frac{\partial \bar{a}}{\partial T} \right |_{\rho,Y} - \bar{a})
 \frac{1}{\bar{b}} ln ( 1 + \frac{\bar{b}}{\tau})
 + 
-k_B T \sum \frac{Y_k}{m_k} \frac{\tau}{\tau -bar{b}} - \frac{\bar{a}}{\tau(\tau + \bar{b})}
+k_B T \sum \frac{Y_k}{m_k} \frac{\bar{b}}{\tau -bar{b}} - \frac{\bar{a}}{\tau(\tau + \bar{b})}
 \]
-except he has a $\bar{b}$ in the numerator of the sum instead of $\tau$, which is iterated 
-across several papers but seems inconsitent with $h = e + p \tau$.  So these need to be checked.
 
 
 
@@ -475,5 +473,3 @@ across several papers but seems inconsitent with $h = e + p \tau$.  So these nee
 \bibliography{nonideal_refs}% Produces the bibliography via BibTeX.
 
 \end{document}
-%
-% ****** End of file apssamp.tex ******
