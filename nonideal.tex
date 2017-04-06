@@ -1,0 +1,479 @@
+\documentclass[11pt]{article}
+
+\usepackage{graphicx}% Include figure files
+\usepackage{dcolumn}% Align table columns on decimal point
+\usepackage{bm}% bold math
+%\usepackage{hyperref}% add hypertext capabilities
+%\usepackage[mathlines]{lineno}% Enable numbering of text and display math
+%\linenumbers\relax % Commence numbering lines
+
+%\usepackage[showframe,%Uncomment any one of the following lines to test
+%%scale=0.7, marginratio={1:1, 2:3}, ignoreall,% default settings
+%%text={7in,10in},centering,
+%%margin=1.5in,
+%%total={6.5in,8.75in}, top=1.2in, left=0.9in, includefoot,
+%%height=10in,a5paper,hmargin={3cm,0.8in},
+%]{geometry}
+
+\usepackage{subfigure}
+\usepackage{longtable}
+\usepackage{lipsum}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+
+\newcommand{\HeatFlux}{\boldsymbol{\mathcal{Q}}}
+\newcommand{\SpeciesFlux}{\boldsymbol{\mathcal{F}}}
+\newcommand{\SpeciesFluxB}{\bar{\boldsymbol{\mathcal{F}}}}
+\newcommand{\StressTensor}{\boldsymbol{\Pi}}
+\newcommand{\ShearViscosity}{\eta}
+\newcommand{\BulkViscosity}{\kappa}
+\newcommand{\ThermalConductivity}{\lambda}
+\newcommand{\EntropyProduction}{\mathfrak{v}}
+\newcommand{\OnsagerMatrix}{\boldsymbol{\mathfrak{L}}}
+\newcommand{\OnsagerMatrixB}{\bar{\boldsymbol{\mathfrak{L}}}}
+\newcommand{\OnesVector}{\mathbf{u}}
+\newcommand{\ChemicalSpeciesLabel}{\mathfrak{M}}
+\newcommand{\StochioPM}{\nu}
+
+\newcommand{\mbar}{\overline{m}}
+\newcommand{\Jbar}{\bar{\mathbf{J}}}
+\newcommand{\Xbar}{\bar{\mathbf{X}}}
+\newcommand{\Lbar}{\bar{\mathbf{L}}}
+\newcommand{\Bbar}{\bar{\mathbf{B}}}
+\newcommand{\Wbar}{\bar{\mathcal{Z}}}
+\newcommand{\Wcbar}{\bar{\mathcal{W}}}
+\newcommand{\Bcbar}{\bar{\mathcal{B}}}
+\newcommand{\lbar}{\bar{\mathbf{l}}}
+\newcommand{\xibar}{\bar{\xi}}
+\newcommand{\DonevDiffusion}{{D}}
+\newcommand{\half}{\frac{1}{2}}
+
+\begin{document}
+\begin{center}
+{\bf
+Multicomponent reacting compressible Navier Stokes for nonideal gases
+}
+
+John B. Bell \\
+Alejandro Garcia \\
+Ray Grout \\
+Emmanuel Motheau \\
+Andrew Nonaka
+
+April 5, 2017
+\end{center}
+
+\section{Equations}
+
+As a prelude, much of the later parts of this that are specific to SRK equation of state are taken from 
+paper by Giovangigli and collaborators \cite{giovangigli_CTM:2011,giovangigli:2011}.
+
+The continuity, species, momentum and energy equations are:
+\begin{equation}
+\frac{\partial }{\partial t} \left( \rho \right)  + { \nabla} \cdot \left( \rho { u} \right) = 0,
+\label{eqn:cont}
+\end{equation}
+\begin{equation}
+\frac{\partial }{\partial t} \left( \rho Y \right)  + { \nabla} \cdot \left( \rho { u} Y \right) + { \nabla} \cdot
+\SpeciesFlux
+=  \omega 
+\label{eqn:spec}
+\end{equation}
+\begin{equation}
+\frac{\partial }{\partial t} \left( \rho { u} \right)  + { \nabla} \cdot \left( \rho { u \otimes u } \right) + { \nabla} p + {\nabla} \cdot   \StressTensor = 0,
+\label{eqn:mom}
+\end{equation}
+\begin{equation}
+\frac{\partial }{\partial t} \left( \rho E \right)  + { \nabla} \cdot \left( \rho { u} E + p { u}  \right) + { \nabla} \cdot  { \HeatFlux}  + \nabla \cdot (\StressTensor u)
+\label{eqn:energy}
+\end{equation}
+where $\rho$, ${u}$ and $p$ denote the density, velocity vector and pressure, respectively, of the mixture.
+The mass fraction of the $k$-th species is given by $Y_k$, and is denoted in vector form as $Y$.
+The different species in the gaseous mixture are assumed to be in thermal equilibrium,
+that is, at a common temperature, $T$.
+
+In the momentum equation, the tensor $\StressTensor$ is the viscous stress and, under the Newtonian assumption, is given by:
+\begin{equation}
+\StressTensor = \eta ( \nabla u + ( \nabla u )^T) + ( \kappa - \frac{2}{3} \eta) \mathbf{I} \nabla \cdot u
+\end{equation}
+
+The formulation of the multi-species stochastic diffusion and heat fluxes is complicated by the couplings among the species fluxes (cross-diffusion effects) and by the thermal diffusion contribution (Soret and Dufour effects).
+The starting point for determining these fluxes
+is the entropy production for a mixture, as formulated by de Groot and Mazur~\cite{DM_63} and by Kuiken~\cite{NewIrrevThermoBook},
+which establishes the form of the thermodynamic forces and fluxes. We then use
+the fluctuation-dissipation principle to formulate the corresponding noise terms.
+Here we only need to consider the contributions of the heat flux and mass diffusion fluxes
+to entropy production.
+The entropy production also has a contribution due to the stress tensor, however,
+due to the Curie symmetry principle \cite{DM_63}, fluxes and thermodynamic forces of different tensorial
+character do not couple.
+
+%Following Eqn. (IV.13) in De Groot and Mazur,
+The entropy production for a
+multi-component mixture at rest, in the absence of external forces~\footnote{This contribution
+is also zero if the external specific force
+acting on each species is constant, as with a constant gravitational acceleration.} and chemistry,
+is given by \cite{DM_63}:
+%
+\begin{eqnarray}
+\EntropyProduction &=&
+-\frac{1}{T^2} \HeatFlux' \cdot \nabla T
+- \frac{1}{T} \sum_{i=1}^{N_s} \SpeciesFlux_i \cdot \nabla_T \mu_i \\
+&=& -\frac{1}{T^2} \HeatFlux' \cdot \nabla T
+- \frac{1}{T} \sum_{i=1}^{N_s-1} \SpeciesFlux_i \cdot \nabla_T \left(\mu_i - \mu_{N_s} \right ),
+\label{eq:dGM1}
+\end{eqnarray}
+%
+where $\mu_i$ is the chemical potential per unit mass of species $i$ and
+\begin{equation}
+\HeatFlux' = \HeatFlux - \sum_{k=1}^{N_s} h_k \SpeciesFlux_k
+= \HeatFlux - \sum_{k=1}^{N_s-1} (h_k-h_{N_s}) \SpeciesFlux_k,
+\end{equation}
+where $h_k $ is the specific enthalpy of the $k^{th}$ component.
+In other words, $\HeatFlux'$ is the part of the heat flux that is \emph{not} associated with mass diffusion.
+Here, $\nabla_T$ is a gradient derivative taken holding temperature fixed, that is,
+\[
+\nabla_T  \; \mu_i(p,T,X_1, \ldots, X_{N_s-1}) = \nabla \mu_i -
+\left(\frac{\partial \mu_i}{\partial T}\right)_{p,X_1, \ldots, X_{N_s-1}}\, \nabla T,
+\]
+where $X_k=n_k/\sum_{j=1}^{N_s} n_j$ are mole fractions, and $n_k$ are number densities.
+The mole fraction for species $k$ is given in terms of the mass fractions by $X_k = ({\overline{m}}/{m_k}) Y_k$,
+where $m_k$ is the
+mass of a molecule of that species, and $\overline{m}=\left( \sum_{k=1}^{N_s}Y_k / m_k \right)^{-1}$ is the mixture-averaged molecular weight \cite{NewIrrevThermoBook}.  Note that only $N_s-1$ of the mass or mole fractions are independent.
+%
+%This form of the heat flux arises from using $\nabla_T \, \mu_i$ instead of the full gradient (and a thermodynamics relation).~\textbf{Add citation or clarify.}
+% note that the sum here is over \emph{all} species.
+
+
+The general form of the phenomenological laws
+expresses the fluxes as linear combinations of thermodynamics forces, written in matrix form as
+\[
+\Jbar = \OnsagerMatrixB \Xbar
+\qquad\mathrm{where}\qquad
+\EntropyProduction = \Jbar^T \Xbar =  \Xbar^T \OnsagerMatrixB^T \Xbar.
+\]
+Here we use an overbar to denote the system expressed in terms of the first $N_s-1$ species.
+From (\ref{eq:dGM1}) the fluxes $\Jbar$ and the thermodynamics forces $\Xbar$ are given by
+\[
+\Jbar =
+\begin{bmatrix} \SpeciesFluxB \\ \HeatFlux'
+\end{bmatrix}
+\qquad \mathrm{and} \qquad
+\Xbar = \begin{bmatrix}
+- \frac{1}{T} \nabla_T ( \mu_i - \mu_{N_s})
+\\
+- \frac{1}{T^{2}}\nabla T
+\end{bmatrix}
+\]
+respectively,  where $\SpeciesFluxB = [\SpeciesFlux_1,\ldots,\SpeciesFlux_{N_s-1}]^T$ is a vector of $N_s-1$ independent species mass fluxes.
+By Onsager reciprocity the matrix of phenomenological coefficients is symmetric so we can write $\OnsagerMatrixB$ as
+\[
+\OnsagerMatrixB =
+\begin{bmatrix}
+{\Lbar} & \lbar
+\\
+{\lbar}^T & \ell
+\end{bmatrix}  \;\;\;  ,
+\]
+where $\Lbar$ is a symmetric $N_s-1 \times N_s-1$ matrix that depends on the multicomponent flux diffusion coefficients, $\lbar$ is an $N_s-1$ component
+vector that depends on the thermal diffusion coefficients, and the scalar $\ell$ depends on the
+partial thermal conductivity.
+
+Before discussing the form of the noise terms we will first recast $\OnsagerMatrixB$ in a slightly different form.
+This form will facilitate comparison with the continuum transport literature (e.g.,~\cite{Giovangigli_99})  and lead
+to a more efficient numerical algorithm.
+We introduce
+\[
+\xibar = \Lbar^{-1} \lbar
+\qquad \mathrm{and} \qquad
+\zeta = \ell - \xibar^T \Lbar \xibar
+\]
+so that
+\begin{equation}
+{\OnsagerMatrixB} =
+\begin{bmatrix}
+{\Lbar} & {\Lbar \xibar}
+\\
+{\xibar^T{\Lbar}} & \zeta + \xibar^T {\Lbar} \xibar
+\end{bmatrix}.
+\label{eq:Lbar_xi}
+\end{equation}
+It is important to point out that this construction works even when $\Lbar$ is not invertible,
+which happens when some of the species are not present. This is because $\xibar$ is always in the range of $\Lbar$.
+
+\subsection{Full System Construction}
+
+The form of the equations above requires that we distinguish a particular species, numbered $N_s$, which must be present
+throughout the entire system. For many applications, this introduces an artificial requirement on the system
+that is difficult to deal with numerically.
+In this section we transform the reduced form with $N_s-1$ equations, used by de Groot and Mazur, to an equivalent full system construction.
+It is noted in de Groot and Mazur that the Onsager reciprocal relations remain valid in the presence
+of linear constraints such as ($\sum Y_k = 1$).
+In particular, we can consider the full system with $N_s+1$ equations (including thermal diffusion) with
+the constraint $\sum_k \mathcal{F}_k  = 0$
+by defining an augmented system that gives exactly the same entropy production.
+In particular, we define an augmented Onsager matrix $\mathbf{L}$ of the form
+\[
+{\mathbf{L}} =
+\begin{bmatrix}
+\Lbar & -{\Lbar}\OnesVector \\
+- \OnesVector^T {\Lbar} & \OnesVector^T\Lbar \OnesVector
+\end{bmatrix}
+\]
+where $\OnesVector = [1,\ldots,1]^T$.  Here the final row gives $\SpeciesFlux_{N_s}$, the diffusion flux of the last species.
+The extra row and column of ${\mathbf{L}}$ are fully specified by the
+requirement that column sums vanish (a consequence of vanishing of the sum of
+species fluxes) and the Onsager symmetry principle.
+
+Using ${\mathbf{L}}$ we can write the phenomenological laws
+for the full system as
+\[
+{\mathbf{J}} = {\OnsagerMatrix} {\mathbf{X}},
+\]
+where the fluxes ${\mathbf{J}}$ and thermodynamics forces ${\mathbf{X}}$ are given by
+\[
+{\mathbf{J}} =
+\begin{bmatrix}
+{\SpeciesFlux}
+\\
+\HeatFlux'
+\end{bmatrix}
+\qquad \mathrm{and} \qquad
+{\mathbf{X}} = \begin{bmatrix}
+- \frac{1}{T} \nabla_T  \mu
+\\
+-\frac{ \nabla T }{ T^2 }
+\end{bmatrix}
+\]
+with
+\begin{equation}
+{\OnsagerMatrix} =
+\begin{bmatrix}
+{{\mathbf{L}}} & {{\mathbf{L}} {\xi}}
+\\
+{\xi}^T{{\mathbf{L}}} & \zeta + {\xi}^T {{\mathbf{L}}} {\xi}
+\end{bmatrix}.
+\label{eq:L_xi}
+\end{equation}
+Ottinger \cite{Ottinger_09} gives a derivation of this
+form using the GENERIC formalism subject to the linear constraint $\sum_{k=1}^{N_s} Y_k=1$.
+
+A direct computation shows that  gives
+\[
+\EntropyProduction
+= \Jbar^T \Xbar
+= {\mathbf{J}}^T {\mathbf{X}}
+=  {\mathbf{X}}^T {\OnsagerMatrix} {\mathbf{X}}.
+\]
+Hence the full system form gives exactly the same entropy production as the original form.
+
+From (\ref{eq:L_xi}) we can then obtain the species flux
+\begin{equation}
+\SpeciesFlux = -\frac{1}{T} \mathbf{L} \left [ \nabla_T \mu + \frac{\xi}{T}\nabla T \right ]
+\label{eq:F_Onsager}
+\end{equation}
+and the deterministic heat flux
+\begin{equation}
+\HeatFlux
+= -\zeta \frac{\nabla T}{T^2}  +
+(\xi^T + \mathbf{h}^T) \SpeciesFlux,
+\label{eq:Q_Onsager}
+\end{equation}
+where $\mathbf{h}$ is the vector of specific enthalpies.
+
+\section{Nonideal systems}
+
+For nonideal fluids we have
+\[
+\mu_k(X,T,p) = \mu_k^0(T,p) + \frac{k_B T}{m_k} ln (X_k) + \frac{k_B T}{m_k} ln (\gamma_k)
+\]
+Note:  John notation:  for a quantify such as $Y$, $Y$ is the vector of the quantity, $Y_k$ is an
+element and $\mathcal{Y}$ is a diagonal matrix of $Y$. For example,
+\[
+\frac{m_k X_k}{\mbar} = Y_k \leftrightarrow \mathcal{M} X = \mbar Y
+\]
+In vector form then
+\[
+\mu_(X,T,p) = \mu^0(T,p) + {k_B T}{\mathcal{M}^{-1}} ln (X_k) + {k_B T}\mathcal{M}^{-1} ln (\gamma)
+\]
+Then
+\begin{eqnarray}
+\nabla_T \mu
+&=& k_b T \mathcal{M}^{-1} \mathcal{X}^{-1} \nabla X +
+ k_b T \mathcal{M}^{-1} Diag(1/\gamma_k) \frac{\partial \gamma}{\partial X} \nabla X + \frac{\partial \mu}{\partial p} \\
+&=& k_b T \mathcal{M}^{-1} \mathcal{X}^{-1} \Gamma \nabla X + \frac{\partial \mu}{\partial p}
+\end{eqnarray}
+where $\Gamma = I + \frac{\partial ln (\gamma)}{\partial ln(X)}$.
+Also
+\[
+\frac{\partial \mu}{\partial p} \equiv \theta = \frac{ \partial \tau}{\partial Y} =
+\frac{-1}{\rho^2}\frac{\partial \rho}{\partial Y}
+\]
+where $\tau$ is specific volume. The second equality is a Maxwell relation.
+
+We don't want to work with this form because $\nabla_T \mu$ is badly behaved when species vanish.
+Introduce the thermodynamic driving force
+\[
+d = \Gamma \nabla X  + \frac{\mbar}{\rho k_B T} (\phi - Y) \nabla p
+\]
+where $\phi = \rho \mathcal{Y} \theta$.  The $Y$ term in the $\nabla p$ part makes thing frame invariant.
+Note that
+\[
+k_B T \mathcal{M}^{-1} \mathcal{X}^{-1} \frac{\mbar}{\rho k_B T} \phi \nabla p = 
+k_B T \mathcal{M}^{-1} \mathcal{X}^{-1} \frac{\mbar}{\rho k_B T} \rho \mathcal{Y} \theta \nabla p 
+= \theta \nabla p
+\]
+Following Giovangigli,
+the multicomponet diffusive fluxes are then given by
+\begin{eqnarray}
+\SpeciesFlux &=& -\rho \mathcal{Y} \mathcal{D} ( d + \frac{\chi}{T} \nabla T) \\
+&=& -\rho \mathcal{Y} \mathcal{D} ( \Gamma \nabla X  + \frac{\mbar}{\rho k_B T} (\phi - Y) \nabla p
+ + \frac{\chi}{T} \nabla T)
+\end{eqnarray}
+It is conventient to write $\chi = \mathcal{X}\tilde{\chi}$ so
+\[
+\SpeciesFlux = -\rho \mathcal{Y} \mathcal{D} ( \Gamma \nabla X  + \frac{\mbar}{\rho k_B T} (\phi - Y) \nabla p
+ + \mathcal{X}\frac{\tilde{\chi}}{T} \nabla T)
+\]
+and
+\[
+\HeatFlux = - \lambda \nabla T + k_B T {\tilde{\chi}}^T \mathcal{M}^{-1} \SpeciesFlux + h^T \SpeciesFlux
+\]
+To link this back to Onsager form
+\[
+L = \frac{\rho \mbar}{k_B} \mathcal{Y} \mathcal{D} \mathcal{Y}
+\]
+\[
+\xi = k_B T \mathcal{M}^{-1} \tilde{\chi}
+\]
+\[
+\zeta = T^2 \lambda
+\]
+
+\section{One approach to make this specific}
+
+What we would like to do is start with an equation of state and derive other quantities we need that
+are thermodynamically consistent.  The EOS doesn't nail things down completely.  A way to get around that
+(which is done by Giovangigli in his nonideal papers) is to
+say
+\[
+p = p^{id} + \Phi
+\]
+where $p^{id}$ is the ideal gas part and assume that as density goes to zero, the EOS becomes
+ideal.  In other words we look at deviation form ideal.
+What Giovangigli does is to write thermodynamic quantities as
+\[
+\Psi = \Psi^{id} - \int_\tau^\infty \frac{\partial \Psi}{\partial \tau} d \tau
+\]
+We can get several variables this way
+\[
+\frac{\partial e_m}{\partial \tau} = T^2 \frac{\partial (\Phi/T)} {\partial T}
+\]
+which is the Helmholtz equation.
+Similarly
+\[
+\frac{\partial s_m}{\partial \tau} = \frac{\partial (e-f)/T}{\partial \tau} = \frac{\partial \Phi}{\partial T}
+\]
+where $f$ is the Helmholtz free energy with $\frac{\partial f}{\partial \tau} = -\Phi$
+
+A similar thing is supposed to work for species chemical potential but it relies on
+\[
+\frac{\partial \mu_k}{\partial \tau} = \frac{\partial \Phi}{\partial Y_k} 
+\]
+and I don't know where that comes form yet.
+
+Another issue is that it gives things as function of $\rho$, $T$ and $Y$.  One of the
+things we need to construct the energy flux is $h_k$, the species enthalpies.
+Those are given by 
+\[
+h_k = \left. \frac{\partial h_k}{\partial Y_k} \right|_{T,p}
+\]
+It turns out as an aside the the low Mach number constraint for general EOS also relies on
+write $h_m$ as a function of $p$, $T$, and $Y$.
+
+\section{Kinetics}
+
+For kinetics you work with rescaled chemical potentials
+\[
+\hat{\mu} = \frac{1}{k_B T} \mathcal{M} \mu
+\]
+Molar production rates are given by
+\[
+\Omega_k = \sum_j (\nu_{ij}^b - \nu_{ij}^f) r_j
+\]
+where 
+\[
+r_j = k_j^s \left [ exp(\nu_{ij}^f \hat{\mu}_i) - exp ( \nu_{ij}^f \hat{\mu}_i) \right ] 
+\]
+where $k_j^s$ is the symmetric reaction rate.
+
+To express this in the more traditional form, we can define backward rates in terms of forward rates
+and equilibrium coefficients.  Giovangigli asserts that ideal equilibrium constants are ok as 
+reference points but I'm not sure about that.
+
+If one can express the chemical potentials in terms of the activity coefficients then the 
+kinetics can be expressed in terms of a generalized law of mass action that involves the $\gamma$'s.
+
+\section{Transport coefficients}
+
+For ideal gas, $\mathcal{D}$ is generated from binary diffusion coefficients, $D_{ij}$ using
+Maxwell Stefan relationships.
+For dense gases, Giovangigli advocates
+\[
+D_{ij} - \frac{n^{st}}{n \\Upsilon_{ij}} D_{ij}^{st}
+\]
+where $n$ is total particle density and $\\Upsilon_{ij}$ is a function of collision diameters.
+
+\section{Soave-Redlich-Kwong}
+
+Soave-Redlich-Kwong is one of the cubic equations of state that represent generalizations of
+van der Waal's EOS.
+(Peng-Robinson is similar).
+
+SRK is given by
+\[
+p = k_B T \sum \frac{Y_k}{m_k} \frac{1}{\tau -bar{b}} - \frac{\bar{a}}{\tau(\tau + \bar{b})}
+\]
+\[
+p^{id} = k_B T \sum \frac{Y_k}{m_k} \frac{1}{\tau}
+\]
+\[
+\Phi_{SRK} = 
+= k_B T \sum \frac{Y_k}{m_k} \frac{\bar{b}}{\tau(\tau -\bar{b})} - \frac{\bar{a}}{\tau(\tau + \bar{b})}
+\]
+Here $\bar{a} = \bar{a}(T, Y_k)$ and $\bar{b} = \bar{b}(Y_k)$
+\[
+\bar{a} = (\mathcal{Y}\sqrt(a))^T  \mathcal{Y}\sqrt(a) \;\;\;  \bar{b} = Y^T b
+\]
+were $a$ is the vector of species attractive parameters that are a function of temperature and are
+set in relation to the critical temperature and $b$ is the vector species repulsive forces which are
+constants (I think) that depend on critical point.
+See Giovangigli papers for form of these.
+
+Giovangigli carries out the derivation of some of the other quantities for SRK. For example,
+\[
+e = Y^T e^{id} + ( T \left . \frac{\partial \bar{a}}{\partial T} \right |_{\rho,Y} - \bar{a})
+\frac{1}{\bar{b}} ln ( 1 + \frac{\bar{b}}{\tau})
+\]
+and
+\[
+h = Y^T h^{id} + ( T \left . \frac{\partial \bar{a}}{\partial T} \right |_{\rho,Y} - \bar{a})
+\frac{1}{\bar{b}} ln ( 1 + \frac{\bar{b}}{\tau})
++ 
+k_B T \sum \frac{Y_k}{m_k} \frac{\tau}{\tau -bar{b}} - \frac{\bar{a}}{\tau(\tau + \bar{b})}
+\]
+except he has a $\bar{b}$ in the numerator of the sum instead of $\tau$, which is iterated 
+across several papers but seems inconsitent with $h = e + p \tau$.  So these need to be checked.
+
+
+
+
+
+\bibliographystyle{unsrt}% Produces the bibliography via BibTeX.
+\bibliography{nonideal_refs}% Produces the bibliography via BibTeX.
+
+\end{document}
+%
+% ****** End of file apssamp.tex ******
