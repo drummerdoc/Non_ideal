@@ -62,6 +62,7 @@ Ray Grout \\
 Emmanuel Motheau \\
 Andrew Nonaka
 
+\vspace{\baselineskip}
 April 5, 2017
 \end{center}
 
@@ -102,10 +103,7 @@ In the momentum equation, the tensor $\StressTensor$ is the viscous stress and, 
 The formulation of the multi-species stochastic diffusion and heat fluxes is complicated by the couplings among the species fluxes (cross-diffusion effects) and by the thermal diffusion contribution (Soret and Dufour effects).
 The starting point for determining these fluxes
 is the entropy production for a mixture, as formulated by de Groot and Mazur~\cite{DM_63} and by Kuiken~\cite{NewIrrevThermoBook},
-which establishes the form of the thermodynamic forces and fluxes. We then use
-the fluctuation-dissipation principle to formulate the corresponding noise terms.
-Here we only need to consider the contributions of the heat flux and mass diffusion fluxes
-to entropy production.
+which establishes the form of the thermodynamic forces and fluxes.
 The entropy production also has a contribution due to the stress tensor, however,
 due to the Curie symmetry principle \cite{DM_63}, fluxes and thermodynamic forces of different tensorial
 character do not couple.
@@ -181,7 +179,7 @@ where $\Lbar$ is a symmetric $N_s-1 \times N_s-1$ matrix that depends on the mul
 vector that depends on the thermal diffusion coefficients, and the scalar $\ell$ depends on the
 partial thermal conductivity.
 
-Before discussing the form of the noise terms we will first recast $\OnsagerMatrixB$ in a slightly different form.
+It is useful to recast $\OnsagerMatrixB$ in a slightly different form.
 This form will facilitate comparison with the continuum transport literature (e.g.,~\cite{Giovangigli_99})  and lead
 to a more efficient numerical algorithm.
 We introduce
@@ -352,6 +350,28 @@ L = \frac{\rho \mbar}{k_B} \mathcal{Y} \mathcal{D} \mathcal{Y}
 \zeta = T^2 \lambda
 \]
 
+This general formalism needs to be linked the to the specific form of the EOS we later use.
+
+\section{Summary of what we need to integrate compressible flow equations}
+
+In order to solve the system, we need to be able to evaluate a number of different things.
+This is an attempt to start a list
+\begin{itemize}
+\item Evaluate $p$ given $\rho$, $T$ and $Y_k$. This implicitly involves whatever mixing rules are used to
+evaluate repulsion and attraction terms in cubic EOS
+\item Evaluate sound speed, basically $\partial ln(p)/ \partial ln(\rho)$ at constant entropy and $Y_k$. This
+can be expressed in terms of other derivatives.
+\item Need matrix of diffusion coefficients $\mathcal{D}$.  This typically requires binary diffusion coefficients and may involve high density corrections
+\item The matrix $\Gamma$ that represents nonideal chemical potential effect on transport
+\item The vector of $\theta$'s (or $\phi$'s) that represent volume fractions in barodiffusion
+\item Need matrix of rescaled thermal diffusion ratios $\tilde{\chi}$ (if you want Soret and Dufour)
+\item Thermal conductivity $\lambda$ and viscosity coefficients $\eta$ and $\kappa$
+\item The species enthalpies $h_k$ that are need to form energy diffusive flux
+\item The species chemical potentials that are needed for chemistry
+\item A specification of chmical rates
+\item One probably needs specific heats, at least to compute thermal diffusion time step limit
+\end{itemize}
+
 \section{One approach to make this specific}
 
 What we would like to do is start with an equation of state and derive other quantities we need that
@@ -367,29 +387,122 @@ What Giovangigli does is to write thermodynamic quantities as
 \[
 \Psi = \Psi^{id} - \int_\tau^\infty \frac{\partial \Psi}{\partial \tau} d \tau
 \]
-We can get several variables this way
-\[
+
+For internal energy from the Helmholtz equation
+\begin{equation}
 \frac{\partial e_m}{\partial \tau} = T^2 \frac{\partial (\Phi/T)} {\partial T}
-\]
-which is the Helmholtz equation.
-Similarly
-\[
-\frac{\partial s_m}{\partial \tau} = \frac{\partial (e-f)/T}{\partial \tau} = \frac{\partial \Phi}{\partial T}
-\]
-where $f$ is the Helmholtz free energy with $\frac{\partial f}{\partial \tau} = -\Phi$
+\end{equation}
+If we use the above and note that $p^{id}/T$ is independent of $T$ then
+\begin{equation}
+\frac{\partial e_m}{\partial \tau} = e^{id}- \int_\tau^\infty  T^2 \frac{\partial (\Phi/T)} {\partial T} d\tau
+\label{eq:energy_gen}
+\end{equation}
 
-A similar thing is supposed to work for species chemical potential but it relies on
+For entropy of mixture, $s_m$,
+start with free energy $f = e_m - Ts_m$.
+We know that
 \[
-\frac{\partial \mu_k}{\partial \tau} = \frac{\partial \Phi}{\partial Y_k} 
+df = -s dT - p d\tau + \sum \mu_k dY_k
 \]
-and I don't know where that comes form yet.
+and for ideal EOS
+\[
+df^{id} = -s^{id} dT - p^{id} d\tau + \sum \mu_k^{id} dY_k
+\]
+Then
+\begin{equation}
+\frac{\partial f}{\partial \tau} = -p \;\; \mathrm{and} \;\;\;
+\frac{\partial f^{id}}{\partial \tau} = -p^{id}
+\end{equation}
+so
+\[
+\frac{\partial (f^{id} - f)}{\partial \tau} = \Phi
+\]
+Ten
+\begin{equation}
+(f^{id} - f)(\tau) - 
+(f^{id} - f)(\tau '' ) = -\int_\tau^{\tau ''} \Phi (\tau ')d\tau ' 
+\end{equation}
+As $\tau'' \rightarrow \infty$, $( f^{id}-f) \rightarrow 0$
+so
+\begin{equation}
+(f^{id} - f)(\tau) 
+ = -\int_\tau^{\infty} \Phi (\tau ')d\tau ' 
+\end{equation}
+or
+\begin{equation}
+(e_m^{id} - e_m)(\tau) - 
+T(s_m^{id} - s_m)(\tau) 
+ = -\int_\tau^{\infty} \Phi (\tau ')d\tau ' 
+\end{equation}
+Rearranging
+\begin{equation}
+s_m = s_m^{id} + \frac{e_m-e_m^{id}}{T} - \frac{1}{T}
+\int_\tau^{\infty} \Phi (\tau ')d\tau ' 
+\end{equation}
+If we now use (\ref{eq:energy_gen})
+we get
+\begin{eqnarray}
+s_m &=& s_m^{id} -
+\int_\tau^\infty  T^2 \frac{\partial (\Phi/T)} {\partial T} d\tau
+- \frac{1}{T}
+\int_\tau^{\infty} \Phi (\tau ')d\tau '  \\
+&=& s^{id}
+-\int_\tau^{\infty} \frac{\partial (\Phi)} {\partial T} d\tau ' 
+\end{eqnarray}
 
-Another issue is that it gives things as function of $\rho$, $T$ and $Y$.  One of the
+From free energy we also have
+\[
+\mu_k = \frac{\partial f}{\partial Y_k} = 
+ \frac{\partial e_m}{\partial Y_k} - 
+ T\frac{\partial s_m}{\partial Y_k} 
+\]
+and
+\[
+\mu_k^{id} = \frac{\partial f^{id}}{\partial Y_k} = 
+ \frac{\partial e_m^{id}}{\partial Y_k} - 
+ T\frac{\partial s_m^{id}}{\partial Y_k} 
+\]
+Using the formulas above
+\begin{eqnarray}
+\mu_k &=& \mu_k^{id} - \frac{\partial}{\partial Y_k} \int_\tau^\infty
+ T^2 \frac{\partial (\Phi/T)} {\partial T} - T \frac{\partial (\Phi)} {\partial T} d\tau \\
+ &=& \mu_k^{id} + \int_\tau^\infty \frac{\partial (\Phi)} {\partial Y_k} d\tau
+\end{eqnarray}
+Note that this is the opposite sign to Giovangigli.
+
+There is, what appears to be, a more straight forward way to derive these results
+but they seem to retain $p$ terms in the integrals
+and the integrals are not convergent. Not sure how to reconcile those with these arguments.
+
+%
+%Similarly
+%\[
+%\frac{\partial s_m}{\partial \tau} = \frac{\partial (e-f)/T}{\partial \tau} = \frac{\partial \Phi}{\partial T}
+%\]
+%where $f$ is the Helmholtz free energy with $\frac{\partial f}{\partial \tau} = -\Phi$
+%
+%A similar thing is supposed to work for species chemical potential but it relies on
+%\[
+%\frac{\partial \mu_k}{\partial \tau} = \frac{\partial \Phi}{\partial Y_k} 
+%\]
+%and I don't know where that comes form yet.
+%
+An issue is that it gives things as function of $\rho$, $T$ and $Y$.  One of the
 things we need to construct the energy flux is $h_k$, the species enthalpies.
 Those are given by 
 \[
 h_k = \left. \frac{\partial h_k}{\partial Y_k} \right|_{T,p}
 \]
+The natural form given by the Giovangigli approach gives things as a function of $\rho$, $T$ and $Y_k$.
+This can be address using
+\[
+\frac{\partial h}{\partial (T,Y,p)}
+= \frac{\partial h}{\partial (T,Y,\rho)}
+\frac{\partial (T,Y,\rho)}{\partial (T,Y,p)}
+= \frac{\partial h}{\partial (T,Y,\rho)}
+\left (\frac{\partial (T,Y,p)}{\partial (T,Y,\rho)} \right)^{-1}
+\]
+
 It turns out as an aside the the low Mach number constraint for general EOS also relies on
 write $h_m$ as a function of $p$, $T$, and $Y$.
 
@@ -422,9 +535,9 @@ For ideal gas, $\mathcal{D}$ is generated from binary diffusion coefficients, $D
 Maxwell Stefan relationships.
 For dense gases, Giovangigli advocates
 \[
-D_{ij} - \frac{n^{st}}{n \\Upsilon_{ij}} D_{ij}^{st}
+D_{ij} - \frac{n^{st}}{n \Upsilon_{ij}} D_{ij}^{st}
 \]
-where $n$ is total particle density and $\\Upsilon_{ij}$ is a function of collision diameters.
+where $n$ is total particle density and $\Upsilon_{ij}$ is a function of collision diameters.
 
 \section{Soave-Redlich-Kwong}
 
@@ -440,7 +553,7 @@ p = k_B T \sum \frac{Y_k}{m_k} \frac{1}{\tau -bar{b}} - \frac{\bar{a}}{\tau(\tau
 p^{id} = k_B T \sum \frac{Y_k}{m_k} \frac{1}{\tau}
 \]
 \[
-\Phi_{SRK} = 
+\Phi_{SRK}
 = k_B T \sum \frac{Y_k}{m_k} \frac{\bar{b}}{\tau(\tau -\bar{b})} - \frac{\bar{a}}{\tau(\tau + \bar{b})}
 \]
 Here $\bar{a} = \bar{a}(T, Y_k)$ and $\bar{b} = \bar{b}(Y_k)$
@@ -462,10 +575,11 @@ and
 h = Y^T h^{id} + ( T \left . \frac{\partial \bar{a}}{\partial T} \right |_{\rho,Y} - \bar{a})
 \frac{1}{\bar{b}} ln ( 1 + \frac{\bar{b}}{\tau})
 + 
-k_B T \sum \frac{Y_k}{m_k} \frac{\bar{b}}{\tau -bar{b}} - \frac{\bar{a}}{\tau(\tau + \bar{b})}
+k_B T \sum \frac{Y_k}{m_k} \frac{\bar{b}}{\tau -\bar{b}} - \frac{\bar{a}}{\tau(\tau + \bar{b})}
 \]
 
-
+Tragically, this doesn't work for Peng-Robinson.  The integral doesn't appear to have a nice closed from solution, at leat as far as I can
+see.
 
 
 
