@@ -56,11 +56,13 @@
 Multicomponent reacting compressible Navier Stokes for nonideal gases
 }
 
+\vspace{\baselineskip}
 John B. Bell \\
 Alejandro Garcia \\
 Ray Grout \\
 Emmanuel Motheau \\
-Andrew Nonaka
+Andrew Nonaka \\
+Shashank
 
 \vspace{\baselineskip}
 April 5, 2017
@@ -417,7 +419,7 @@ so
 \[
 \frac{\partial (f^{id} - f)}{\partial \tau} = \Phi
 \]
-Ten
+Then
 \begin{equation}
 (f^{id} - f)(\tau) - 
 (f^{id} - f)(\tau '' ) = -\int_\tau^{\tau ''} \Phi (\tau ')d\tau ' 
@@ -462,6 +464,13 @@ and
  \frac{\partial e_m^{id}}{\partial Y_k} - 
  T\frac{\partial s_m^{id}}{\partial Y_k} 
 \]
+As an aside, for ideal gases, $\mu_k = h_k + T s_k$.  It is worth noting for ideal gases 
+that
+\[
+\mu_k = \partial_{Y_k} (e - T s) = 
+ \partial_{Y_k} \sum Y_k(e_k - T s_k) = e_k - T s_k - T Y_k \partial_{Y_K}s_k = h_k + T s_k
+\]
+
 Using the formulas above
 \begin{eqnarray}
 \mu_k &=& \mu_k^{id} - \frac{\partial}{\partial Y_k} \int_\tau^\infty
