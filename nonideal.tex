@@ -590,7 +590,98 @@ k_B T \sum \frac{Y_k}{m_k} \frac{\bar{b}}{\tau -\bar{b}} - \frac{\bar{a}}{\tau(\
 Tragically, this doesn't work for Peng-Robinson.  The integral doesn't appear to have a nice closed from solution, at leat as far as I can
 see.
 
+\section{Departure Functions}
+Following derivations presented in the book by Poling~\cite{poling2001properties} we can derive generalized expressions for functions representing departure from ideal gas behaviors. In all the equations listed below the departure functions are presented in the form $F^{d} = F^{ig} - F^{rg}$ where the superscripts $ig$ and $rg$ denote ideal gas and real gas respectively. 
+\begin{enumerate}
+\item Compressibility factor: 1 - Z
+\item Internal energy e:  
+\begin{equation}
+\label{eq:DepartInternalEnergyIntegral}
+\frac{e^{ig}-e}{RT} = \int_{V}^{\infty} \left[ T \left(\frac{\partial Z}{\partial T}\right)_{V} \right] \frac{dV}{V}
+\end{equation}
+\item Enthalpy h: 
+\begin{equation}
+\frac{h^{ig}-h}{RT} = \frac{e^{ig}-e}{RT}  + 1 - Z
+\end{equation}
+\item Helmholtz energy A: 
+\begin{equation}
+\frac{A^{ig}-A}{RT} = \int_{V}^{\infty} \left[1-Z\right]\frac{dV}{V} + ln Z
+\end{equation}
+\item Entropy s:
+\begin{equation}
+\frac{s^{ig}-s}{RT} = \frac{e^{ig}-e}{RT}  -  \frac{A^{ig}-A}{RT}
+\end{equation}
+\item Gibbs energy, G:
+\begin{equation}
+\frac{G^{ig}-G}{RT} = \frac{A^{ig}-A}{RT} + 1 - Z
+\end{equation}
+\end{enumerate}
+A generalized cubic EOS in terms of compressibility factor, Z can be written as 
+\begin{equation}
+Z = \frac{V}{V-B_{m}} - \frac{\left(\Theta/RT\right) V}{\left(V^{2} - \delta V + \epsilon \right)}
+\end{equation}
+where for
+\begin{enumerate} 
+\item Redlich-Kwong (RK) EOS: $\delta = B_{m}$, $\epsilon = 0$, $\Theta = A_{m}/\sqrt{T_{r}}$ 
+\item Peng-Robinson (PR) EOS: $\delta = 2 B_{m}$, $\epsilon = -B_{m}^2$, $\Theta = A_{m} \alpha(T_{r})$. 
+\end{enumerate} 
+Using the above presented form of EOS and departure functions defined in Eq.~\ref{eq:DepartInternalEnergyIntegral}, exact form of departure functions for cubic EOS can represented as the following 
+\begin{enumerate}
+\item Internal energy e, RK: 
 
+\begin{equation}
+\left(\frac{\partial Z}{\partial T}\right)_{V} = \frac{3}{2} \frac{A_{m}}{R T^{2} \left[V+B_{m} \right]}
+\end{equation}
+
+\begin{align}
+e^{ig} - e &= \frac{3 A_{m}}{2} \int_{V}^{\infty} \frac{dV}{V^{2}+V B_{m}} \\
+               & = \frac{3 A_{m}}{2 B_{m}} ~ln \left[\frac{V}{V+B_{m}}\right]
+\end{align}
+In order to simplify relationships for other quantities, a quantity $K_{1}$ will be defined
+\begin{equation}
+K_{1} = \frac{1}{B_{m}} ~ln \left[\frac{V}{V+B_{m}}\right]
+\end{equation}
+\item Internal energy e, PR:
+
+\begin{equation}
+\left(\frac{\partial Z}{\partial T}\right)_{V} = \left[ \frac{-V}{V^{2}+ 2V B_{m} - B_{m}^{2}}\right]\left[ \frac{\frac{\partial A_{m}}{\partial T}T -A_{m}}{R T^{2}}\right]
+\end{equation}
+\begin{align}
+e^{ig} - e & = T \int_{V}^{\infty} \left[ \frac{-1}{V^{2}+2 V B_{m}-B_{m}^{2}}\right] \left[ \frac{\partial A_{m}}{\partial T} - \frac{A_{m}}{T}\right] dV \\
+               & = \left[ -T \frac{\partial A_{m}}{\partial T} + A_{m}\right] \int_{V}^{\infty} \frac{dV}{\left[V+(1-\sqrt{2}) B_{m} \right] \left[ V+(1+\sqrt{2}) B_{m} \right]} \\
+               & = \left[ T \frac{\partial A_{m}}{\partial T} - A_{m}\right] \frac{1}{\sqrt{2}B_{m}} tanh^{-1}\left(\frac{V+B_{m}}{\sqrt{2}B_{m}}\right)
+\end{align}
+Similar to the case with RK EOS, a quantity $K_{1}$ can be defined 
+\begin{equation}
+K_{1} = \frac{1}{\sqrt{2}B_{m}} tanh^{-1}\left(\frac{V+B_{m}}{\sqrt{2}B_{m}}\right)
+\end{equation}
+For both RK EOS and PR EOS the internal energy departure function can be written as 
+\begin{equation}
+e^{ig} - e = \left[ T \frac{\partial A_{m}}{\partial T} - A_{m}\right] K_{1}
+\label{eq:internalEnergyFinal}
+\end{equation}
+\item Enthalpy h: 
+For both RK EOS and PR EOS
+\begin{equation}
+h^{ig} - h = \left[ T \frac{\partial A_{m}}{\partial T} - A_{m}\right] K_{1} + (1 - Z) RT
+\end{equation}
+\item Specific heat at constant Pressure, Cp: In order to calculate Temperature from enthalpy we would need an expression for Cp. In order to derive this expression we would rely on the equation for internal energy, Eq.~\ref{eq:internalEnergyFinal}
+\begin{equation}
+C_{V} = \left(\frac{\partial e}{\partial T}\right)_{V} = C_{v}^{ig} - K1 \left[T \frac{\partial^{2} A_{m}}{\partial T^{2}} \right]
+\end{equation}
+Using the following relation
+\begin{equation}
+C_{P} = C_{V}  
+\end{equation}
+In the case of ideal gas the above expression is equivalent to 
+\begin{equation}
+C_{P}^{ig} = C_{V}^{ig} - R
+\end{equation}
+Thus the final expression for $C_{P}$ is 
+\begin{equation}
+C_{P} = C_{P}^{ig} -R -K1 \left[T \frac{\partial^{2} A_{m}}{\partial T^{2}} \right] - T\left(\frac{\partial P}{\partial T}\right)^{2}_{V}/ \left(\frac{\partial P}{\partial V}\right)_{T}
+\end{equation}
+\end{enumerate}
 
 \bibliographystyle{unsrt}% Produces the bibliography via BibTeX.
 \bibliography{nonideal_refs}% Produces the bibliography via BibTeX.
