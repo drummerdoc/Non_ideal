@@ -22,6 +22,15 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 
+\newcommand{\comment}[1]{}
+
+\setlength{\marginparwidth}{0.75in}
+\newcommand{\MarginPar}[1]{\marginpar{%
+\vskip-\baselineskip %raise the marginpar a bit
+\raggedright\tiny\sffamily
+\hrule\smallskip{\color{red}#1}\par\smallskip\hrule}}
+
+
 
 \newcommand{\HeatFlux}{\boldsymbol{\mathcal{Q}}}
 \newcommand{\SpeciesFlux}{\boldsymbol{\mathcal{F}}}
@@ -65,7 +74,7 @@ Andrew Nonaka \\
 Shashank Yellapantula
 
 \vspace{\baselineskip}
-April 5, 2017
+April 19, 2017
 \end{center}
 
 \section{Equations}
@@ -93,6 +102,7 @@ The continuity, species, momentum and energy equations are:
 \label{eqn:energy}
 \end{equation}
 where $\rho$, ${u}$ and $p$ denote the density, velocity vector and pressure, respectively, of the mixture.
+$E = e + \half u^T u$ is the total energy with internal energy $e$.
 The mass fraction of the $k$-th species is given by $Y_k$, and is denoted in vector form as $Y$.
 The different species in the gaseous mixture are assumed to be in thermal equilibrium,
 that is, at a common temperature, $T$.
@@ -366,13 +376,15 @@ can be expressed in terms of other derivatives. Please see Sec.~\ref{sec:Speedof
 \item Need matrix of diffusion coefficients $\mathcal{D}$.  This typically requires binary diffusion coefficients and may involve high density corrections
 \item The matrix $\Gamma$ that represents nonideal chemical potential effect on transport
 \item The vector of $\theta$'s (or $\phi$'s) that represent volume fractions in barodiffusion
-\item Need matrix of rescaled thermal diffusion ratios $\tilde{\chi}$ (if you want Soret and Dufour)
+\item Need vector of rescaled thermal diffusion ratios $\tilde{\chi}$ (if you want Soret and Dufour)
 \item Thermal conductivity $\lambda$ and viscosity coefficients $\eta$ and $\kappa$
 \item The species enthalpies $h_k$ that are need to form energy diffusive flux. Please see Sec.~\ref{sec:PartialEnthalpies}. 
 \item The species chemical potentials that are needed for chemistry
 \item A specification of chmical rates
 \item One probably needs specific heats, at least to compute thermal diffusion time step limit. Please see Eq.~\ref{eq:CpRelation}
 \end{itemize}
+
+See John's summary in Secion \ref{sec:john_summ}
 
 \section{One approach to make this specific}
 
@@ -527,7 +539,7 @@ Molar production rates are given by
 \]
 where 
 \[
-r_j = k_j^s \left [ exp(\nu_{ij}^f \hat{\mu}_i) - exp ( \nu_{ij}^f \hat{\mu}_i) \right ] 
+r_j = k_j^s \left [ exp(\nu_{ij}^f \hat{\mu}_i) - exp ( \nu_{ij}^b \hat{\mu}_i) \right ] 
 \]
 where $k_j^s$ is the symmetric reaction rate.
 
@@ -538,15 +550,6 @@ reference points but I'm not sure about that.
 If one can express the chemical potentials in terms of the activity coefficients then the 
 kinetics can be expressed in terms of a generalized law of mass action that involves the $\gamma$'s.
 
-\section{Transport coefficients}
-
-For ideal gas, $\mathcal{D}$ is generated from binary diffusion coefficients, $D_{ij}$ using
-Maxwell Stefan relationships.
-For dense gases, Giovangigli advocates
-\[
-D_{ij} - \frac{n^{st}}{n \Upsilon_{ij}} D_{ij}^{st}
-\]
-where $n$ is total particle density and $\Upsilon_{ij}$ is a function of collision diameters.
 
 \section{Soave-Redlich-Kwong}
 
@@ -556,18 +559,18 @@ van der Waal's EOS.
 
 SRK is given by
 \[
-p = k_B T \sum \frac{Y_k}{m_k} \frac{1}{\tau - \bar{b}} - \frac{\bar{a}}{\tau(\tau + \bar{b})}
+p = k_B T \sum \frac{Y_k}{m_k} \frac{1}{\tau - b_m} - \frac{a_m}{\tau(\tau + b_m)}
 \]
 \[
 p^{id} = k_B T \sum \frac{Y_k}{m_k} \frac{1}{\tau}
 \]
 \[
 \Phi_{SRK}
-= k_B T \sum \frac{Y_k}{m_k} \frac{\bar{b}}{\tau(\tau -\bar{b})} - \frac{\bar{a}}{\tau(\tau + \bar{b})}
+= k_B T \sum \frac{Y_k}{m_k} \frac{b_m}{\tau(\tau -b_m)} - \frac{a_m}{\tau(\tau + b_m)}
 \]
-Here $\bar{a} = \bar{a}(T, Y_k)$ and $\bar{b} = \bar{b}(Y_k)$
+Here $a_m = a_m(T, Y_k)$ and $b_m = b_m(Y_k)$
 \[
-\bar{a} = (\mathcal{Y}\sqrt(a))^T  \mathcal{Y}\sqrt(a) \;\;\;  \bar{b} = Y^T b
+a_m = (\mathcal{Y}\sqrt(a))^T  \mathcal{Y}\sqrt(a) \;\;\;  b_m = Y^T b
 \]
 were $a$ is the vector of species attractive parameters that are a function of temperature and are
 set in relation to the critical temperature and $b$ is the vector species repulsive forces which are
@@ -576,15 +579,15 @@ See Giovangigli papers for form of these.
 
 Giovangigli carries out the derivation of some of the other quantities for SRK. For example,
 \[
-e = Y^T e^{id} + ( T \left . \frac{\partial \bar{a}}{\partial T} \right |_{\rho,Y} - \bar{a})
-\frac{1}{\bar{b}} ln ( 1 + \frac{\bar{b}}{\tau})
+e = Y^T e^{id} + ( T \left . \frac{\partial a_m}{\partial T} \right |_{\rho,Y} - a_m)
+\frac{1}{b_m} ln ( 1 + \frac{b_m}{\tau})
 \]
 and
 \[
-h = Y^T h^{id} + ( T \left . \frac{\partial \bar{a}}{\partial T} \right |_{\rho,Y} - \bar{a})
-\frac{1}{\bar{b}} ln ( 1 + \frac{\bar{b}}{\tau})
+h = Y^T h^{id} + ( T \left . \frac{\partial a_m}{\partial T} \right |_{\rho,Y} - a_m)
+\frac{1}{b_m} ln ( 1 + \frac{b_m}{\tau})
 + 
-k_B T \sum \frac{Y_k}{m_k} \frac{\bar{b}}{\tau -\bar{b}} - \frac{\bar{a}}{\tau(\tau + \bar{b})}
+k_B T \sum \frac{Y_k}{m_k} \frac{b_m}{\tau -b_m} - \frac{b_m}{\tau(\tau + b_m)}
 \]
 
 Tragically, this doesn't work for Peng-Robinson.  The integral doesn't appear to have a nice closed from solution, at leat as far as I can
@@ -608,6 +611,7 @@ Following derivations presented in the book by Poling~\cite{poling2001properties
 \frac{A^{ig}-A}{RT} = \int_{V}^{\infty} \left[1-Z\right]\frac{dV}{V} + ln Z
 \end{equation}
 \item Entropy s:
+\MarginPar{I think there is a typo here}
 \begin{equation}
 \frac{s^{ig}-s}{RT} = \frac{e^{ig}-e}{RT}  -  \frac{A^{ig}-A}{RT}
 \end{equation}
@@ -622,6 +626,8 @@ Z = \frac{V}{V-B_{m}} - \frac{\left(\Theta/RT\right) V}{\left(V^{2} - \delta V +
 \end{equation}
 where for
 \begin{enumerate} 
+\MarginPar{We want to only consider Soave correction to RK (SRK}
+\MarginPar{Form of $A_m$ is not correct for mixtures i thnk}
 \item Redlich-Kwong (RK) EOS: $\delta = B_{m}$, $\epsilon = 0$, $\Theta = A_{m}/\sqrt{T_{r}}$ 
 \item Peng-Robinson (PR) EOS: $\delta = 2 B_{m}$, $\epsilon = -B_{m}^2$, $\Theta = A_{m} \alpha(T_{r})$. 
 \end{enumerate} 
@@ -666,6 +672,7 @@ For both RK EOS and PR EOS
 \begin{equation}
 h^{ig} - h = \left[ T \frac{\partial A_{m}}{\partial T} - A_{m}\right] K_{1} + (1 - Z) RT
 \end{equation}
+\MarginPar{Stopped checking thing here.  Easier way to get some of this and got lost in notation}
 \item Specific heat at constant Pressure, Cp: In order to calculate Temperature from enthalpy we would need an expression for Cp and to derive this expression we would rely on the equation for internal energy, Eq.~\ref{eq:internalEnergyFinal}
 \begin{equation}
 C_{V} = \left(\frac{\partial e}{\partial T}\right)_{V} = C_{v}^{ig} - K1 \left[T \frac{\partial^{2} A_{m}}{\partial T^{2}} \right]
@@ -779,6 +786,216 @@ The other relationship relating $\kappa_{s}$ and $\kappa_{T}$ can be derived fro
      \section{Additional derivatives}
      In the previous two sections a few derivatives of the equation of state (EOS), in terms of P, T and V were left undefined. In this section closed form expressions for those derivatives are presented. 
      
+\section{Pragmatic summary}
+\label{sec:john_summ}
+
+This section is intended to be a summary with an eye toward what needs to be implemented.  I have
+have expressed things in terms of specific quantities. (Here $\tau$ is specific volume.)
+We want to consider cubic equations of state, either SRK or PR.  we need to have allow for a
+fairly general (up to thermodynamic stability) mixing rule for attractive ($a_m$) and repulsive ($b_m$)
+terms.  Speciifcally, $a_m$ depends on $T$ and composition and $b_m$ depdends of composition.  Composiiton
+can be expressed in terms of $Y_k$ or $X_k$.   Pressure determines thermodynamics
+up to a function of temperature.  
+We assume at low pressure (or low density) we approach ideal gas behavior.  That then specifies
+the full thermodynamics of the system.
+
+We compute basic thermodynamic quantities using difference of nonideal pressure and ideal pressure.
+This can be done in either the way Giovangigli does it (Section 4) or using compressibility factor (Section 8).
+I am confident these are actually identical but haven't fully checked it.
+From these relations one can compute $e_m$, $s_m$, and $h_m$ where the $m$ subscript denotes the mixture.
+The integrals for SRK are easy when $\tau > b_m$.  PR integrals are uglier.
+We also then know the free energy $f = e_m - T s_m$.
+Note that all of these quantifies are expressed as functions $T$, $Y$ (or $X$) and $\tau$ (or $\rho$).
+
+\subsection{Basic thermodynamic quantities}
+
+From these quantifies and the change of variables formula at the end of Section 4 (equivalent to Legendre
+transformations in classical thermodynamics I think) we can compute the things we need.
+For this section, I will adopt combustion notation instead of physics notation and use gas constant
+and molecular weights instead of Boltmann's constant and molecular weights.  
+\[
+c_v = \left( \frac{\partial e_m}{\partial T}\right)_{\tau,Y}
+\]
+\[
+c_p = \left( \frac{\partial h_m}{\partial T}\right)_{p,Y}
+\]
+The first adiabatic exponent
+\[
+\Gamma_1 = \frac{c_p}{c_v} \frac{\rho}{p} 
+\left( \frac{\partial p}{\partial \rho}\right)_{T,Y}
+\]
+Sound speed is then $(\Gamma_1 p / \rho)^\half$.
+\[
+h_k = \left( \frac{\partial h_m}{\partial Y_k}\right)_{p,T,Y_j}
+\]
+Chemical potential is given by
+\[
+\mu_k = \left( \frac{\partial f}{\partial Y_k}\right)_{\tau,T,Y_j}
+\]
+
+In the general discussion above, we introduced the notion of $\gamma_k$ which were the activity coefficients.
+When I look at the formulae those don't seem to add much.
+Instead we will try to capture the deviation between the pure component ideal gas chemical potential and
+the real chemical potential.
+
+There are a couple of ways to write $\mu_k^{id}$.
+The most natural was is to write it as
+\[
+\mu_k^{u,id} + \frac{R T}{W_k} ln (X_k)
+\]
+where 
+\begin{equation}
+\mu_k^{u,id} = h_k - T s_k^* + \frac{R T}{W_k} ln(p/p_0)
+\label{eq:chem_uid_frac}
+\end{equation}
+where $p_0$ is a reference pressure (atmospheric).
+Not that in this form it is a function of $T$ and $p$ so some care is needed.
+It can also be written as
+\begin{equation}
+\mu_k^{id} = h_k - T s_k^* + \frac{R T}{W_k} ln(RT/p_0) + \frac{R}{W_k} ln([X_k])
+\end{equation}
+where $[X_k]$ is the molar concentration.
+This leads to an alternative form of the pure component ideal chemical potential
+\begin{equation}
+\mu_k^{u,id,alt} = h_k - T s_k^* + \frac{R T}{W_k} ln(RT/p_0)
+\label{eq:chem_uid_conc}
+\end{equation}
+This eliminates the dependence of $\mu_k^{id}$ on $p$ but expresses things in terms of
+concentrations.  This simplifies the algebra a bit when looking a chemical equilibrium but
+I suggest we not try to use it.
+
+Instead of the writing using the $\gamma_k$ we will define
+\begin{equation}
+a_k = exp[\mu_k - \mu_k^{u,id}]
+\label{eq:deviate_ideal}
+\end{equation}
+With this definition, in the ideal gas limit, $a_k$ is the mole fraction $X_k$. For the kinetics,
+we also define
+\[
+[a_k] = \frac{P}{R T}  a_k
+\]
+which acts like a generalized concentration.
+
+\subsection{Kinetics}
+
+As in the earlier section, for kinetics we work with rescaled chemical potentials
+\[
+\hat{\mu}_k = \frac{W_k}{R T}  \mu_k
+\]
+Molar production rates are given by
+\[
+\Omega_i = \sum_k (\nu_{ij}^b - \nu_{ij}^f) \mathcal{R}_j
+\]
+where 
+\[
+\mathcal{R}_j = k_j^s \left [ exp(\nu_{jk}^f \hat{\mu}_k) - exp ( \nu_{jk}^b \hat{\mu}_k) \right ] 
+\]
+where $k_j^s$ is the symmetric reaction rate.
+Note the rates are not thermodynamic quantifies.  They are specified separately.
+This describes the rate at which the reaction approaches equilibrium where
+\[
+ exp(\nu_{jk}^f \hat{\mu}_k) = exp ( \nu_{jk}^b \hat{\mu}_k) 
+\]
+After some algebra, the equilibrium condition becomes
+\begin{equation}
+ exp( (\nu_{jk}^f - \nu_{jk}^b) \hat{\mu}_k^{u,id}) = \prod_k a_k^{\nu_{jk}^b-\nu_{jk}^f}
+\end{equation}
+We now rescale $a_k$ to $[a_k]$ to obtain
+\begin{equation}
+\left ( \frac{p_0}{R T}  \right )^{\sum \nu_{jk}^b-\nu_{jk}^f) }exp( (\nu_{jk}^f - \nu_{jk}^b) \hat{\mu}_k^{u,id}) = \prod_k [a_k]^{\nu_{jk}^b-\nu_{jk}^f}
+\label{eq:kin_equil_sym}
+\end{equation}
+If we write the reactions in a more traditional way
+\begin{equation}
+\mathcal{R}_j = k_j^f \prod_k [a_k]^{\nu_{jk}^f}
+- k_j^b \prod_k [a_k]^{\nu_{jk}^b}
+\end{equation}
+In this form at equilbrium net rate is zero so
+\begin{equation}
+ k_j^f \prod_k [a_k]^{\nu_{jk}^f}
+= k_j^b \prod_k [a_k]^{\nu_{jk}^b}
+\end{equation}
+Then
+\begin{equation}
+\frac{k_j^f}{k_j^b} \equiv K_j^{EQ} = 
+\prod_k [a_k]^{\nu_{jk}^f - \nu_{jk}^b}
+= 
+\left ( \frac{p_0}{R T}  \right )^{\sum \nu_{jk}^b-\nu_{jk}^f) } exp( (\nu_{jk}^f - \nu_{jk}^b) \hat{\mu}_k^{u,id})
+\label{eq:kin_equil_trad}
+\end{equation}
+We can use $k_j^f$ in traditional Arrehnius form with this definition of equilibrium and all is thermodynamically
+consistent.  Can also try working in symmteric form with
+\[
+k_j^s =  k_j^f 
+\left ( \frac{p_0}{R T}  \right )^{\sum \nu_{jk}^f) }exp( -\nu_{jk}^f \hat{\mu}_k^{u,id})
+\]
+
+\subsection{Species transport}
+
+For the species transport, we write the chemical potential as
+\begin{eqnarray}
+\mu_k &=& \mu_k^{u,id} + \frac{R}{W_k} ln(X_k)  +  \mu_k^{sm} \\
+ &=& h_k - T s_k^* + \frac{R T}{W_k} ln(p/p_0) + \frac{R}{W_k} ln(X_k) + \mu_k^{sm}
+\end{eqnarray}
+This is likely equivalent to using the $\gamma$ if we define them in the right way but I'm not sure
+introducing the $ln$ does us much good.
+At least according to Giovangigli, $\mu_k^{sm}$ is smooth as species vanish.  For SRk this appears to be true.
+
+In vector form we have (thinking of $\mu$ as a function of $T$, $p$ and $X$
+\begin{equation}
+\nabla_T \mu
+= R T \mathcal{W}^{-1} \mathcal{X}^{-1} \nabla X +
++ R T \mathcal{W}^{-1} \nabla_{T,p} \; \mu^{sm} +
++ \frac{\partial \mu}{\partial p}
+\end{equation}
+As before we note the
+\[
+\left(\frac{\partial \mu}{\partial p}\right)_{X,T} \equiv \theta = \left(\frac{ \partial \tau}{\partial Y}\right)_{T,P}
+ =
+\frac{-1}{\rho^2}\left (\frac{\partial \rho}{\partial Y} \right)_{T,p}
+\]
+and we define
+\[
+\phi = \rho \mathcal{Y} \theta
+\]
+We then define the thermodynamic driving force
+\[
+d = \nabla X  + \frac{\overline{W}}{R T} \mathcal{W} \mathcal{Y} \nabla_{T,P} \; \mu^{sm}  \frac{\mbar}{\rho k_B T} (\phi - Y) \nabla p
+\]
+and
+\[
+\mathcal{F} = - \rho \mathcal{Y} \mathcal{D} ( d + \mathcal{X} \frac{ \tilde{\chi}}{T} \nabla T)
+\]
+and
+\[
+\HeatFlux = - \lambda \nabla T + k_B T {\tilde{\chi}}^T \mathcal{M}^{-1} \SpeciesFlux + h^T \SpeciesFlux
+\]
+
+\subsection{Transport coefficients}
+
+NOTE:  These need more work.
+
+For ideal gas, $\mathcal{D}$ is generated from binary diffusion coefficients, $D_{ij}$ using
+Maxwell Stefan relationships.
+For dense gases, from kinetic theory of dense gases we modify the binary diffusion coefficent to
+\[
+D_{ij} = \frac{n^{st}}{n \Upsilon_{ij}} D_{ij}^{st}
+\]
+where $n$ is total particle density and $\Upsilon_{ij}$ is a function of collision diameters.
+The $\Upsilon$ are given in \cite{KurochkinETAL:1984}.
+See Eq. (35) in \cite{giovangigli_CTM:2011}.
+
+Thermal conductivity can be given as
+\[
+\lambda = \lambda^{dil} \beta + \lambda^{hp}
+\]
+from Chung et al. \cite{chung:1988} and Ely and Hanley \cite{ElyHanley:1983}
+
+Giovangigli uses dilute thermal diffusion rations in 
+\cite{giovangigli_CTM:2011}.
+Not sure what to use for high pressure viscosities.
+
+
 
 \bibliographystyle{unsrt}% Produces the bibliography via BibTeX.
 \bibliography{nonideal_refs}% Produces the bibliography via BibTeX.
