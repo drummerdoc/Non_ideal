@@ -854,7 +854,7 @@ where $p_0$ is a reference pressure (atmospheric).
 Not that in this form it is a function of $T$ and $p$ so some care is needed.
 It can also be written as
 \begin{equation}
-\mu_k^{id} = h_k - T s_k^* + \frac{R T}{W_k} ln(RT/p_0) + \frac{R}{W_k} ln([X_k])
+\mu_k^{id} = h_k - T s_k^* + \frac{R T}{W_k} ln(RT/p_0) + \frac{R T}{W_k} ln([X_k])
 \end{equation}
 where $[X_k]$ is the molar concentration.
 This leads to an alternative form of the pure component ideal chemical potential
@@ -874,7 +874,7 @@ a_k = exp[\mu_k - \mu_k^{u,id}]
 With this definition, in the ideal gas limit, $a_k$ is the mole fraction $X_k$. For the kinetics,
 we also define
 \[
-[a_k] = \frac{P}{R T}  a_k
+[a_k] = \frac{p}{R T}  a_k
 \]
 which acts like a generalized concentration.
 
@@ -929,7 +929,7 @@ We can use $k_j^f$ in traditional Arrehnius form with this definition of equilib
 consistent.  Can also try working in symmteric form with
 \[
 k_j^s =  k_j^f 
-\left ( \frac{p_0}{R T}  \right )^{\sum \nu_{jk}^f) }exp( -\nu_{jk}^f \hat{\mu}_k^{u,id})
+\left ( \frac{p_0}{R T}  \right )^{\sum \nu_{jk}^f }exp( -\nu_{jk}^f \hat{\mu}_k^{u,id})
 \]
 
 \subsection{Species transport}
@@ -952,7 +952,7 @@ In vector form we have (thinking of $\mu$ as a function of $T$, $p$ and $X$
 \end{equation}
 As before we note the
 \[
-\left(\frac{\partial \mu}{\partial p}\right)_{X,T} \equiv \theta = \left(\frac{ \partial \tau}{\partial Y}\right)_{T,P}
+\left(\frac{\partial \mu}{\partial p}\right)_{X,T} \equiv \theta = \left(\frac{ \partial \tau}{\partial Y}\right)_{T,p}
  =
 \frac{-1}{\rho^2}\left (\frac{\partial \rho}{\partial Y} \right)_{T,p}
 \]
@@ -962,7 +962,7 @@ and we define
 \]
 We then define the thermodynamic driving force
 \[
-d = \nabla X  + \frac{\overline{W}}{R T} \mathcal{W} \mathcal{Y} \nabla_{T,P} \; \mu^{sm}  \frac{\mbar}{\rho k_B T} (\phi - Y) \nabla p
+d = \nabla X  + \frac{\overline{W}}{R T} \mathcal{W} \mathcal{Y} \nabla_{T,p} \; \mu^{sm}  \frac{\mbar}{\rho k_B T} (\phi - Y) \nabla p
 \]
 and
 \[
