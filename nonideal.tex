@@ -794,7 +794,9 @@ have expressed things in terms of specific quantities. (Here $\tau$ is specific 
 We want to consider cubic equations of state, either SRK or PR.  we need to have allow for a
 fairly general (up to thermodynamic stability) mixing rule for attractive ($a_m$) and repulsive ($b_m$)
 terms.  Speciifcally, $a_m$ depends on $T$ and composition and $b_m$ depdends of composition.  Composiiton
-can be expressed in terms of $Y_k$ or $X_k$.   Pressure determines thermodynamics
+can be expressed in terms of $Y_k$ or $X_k$.  I would suggest for the moment we use the mass weighted
+mixing rules as per Poling 5.5.2b and 5.5.3.  These make some of the formulae (particularly chemical
+potentials) simpler.   Pressure determines thermodynamics
 up to a function of temperature.  
 We assume at low pressure (or low density) we approach ideal gas behavior.  That then specifies
 the full thermodynamics of the system.
@@ -993,7 +995,38 @@ from Chung et al. \cite{chung:1988} and Ely and Hanley \cite{ElyHanley:1983}
 
 Giovangigli uses dilute thermal diffusion rations in 
 \cite{giovangigli_CTM:2011}.
-Not sure what to use for high pressure viscosities.
+
+From BCH and Chapman and Cowling,
+for single component gases define
+\[
+\beta = \frac {2}{3} \pi n \sigma^3 \;\;\; \mathrm{and} \;\;\; \zeta = 1+\frac{5}{8} \beta
+\]
+where $\sigma$ is molecular diameter.
+Then for dense gases they define
+\[
+\eta = \eta_0 (\frac{1}{\zeta} + 0.8 \beta + 0.761 \beta^2 \zeta)
+\]
+where $\eta_0$ is the low pressure shear viscosity.
+
+They also set bulk viscosity as
+\[
+\kappa = 1.002 \eta_0 \beta^2 \zeta
+\]
+This has rather a hard sphere quality
+
+For a monatomic gas they also set
+\[
+\lambda = \lambda_0 (\frac{1}{\zeta} + 1.2 \beta + 0.755 \beta^2 \zeta)
+\]
+but this is not supposed to be good for polyatomic molecules.
+For polyatomic they suggest
+\[
+\lambda = \eta_0 \frac{R}{W \zeta} \left(\frac{c_v}{k_b} + \frac{9}{4} \right)
++ \frac{15 R}{4 w} \eta_0 \beta \left( 1.2 + 0.755 \beta \zeta \right ) 
+\]
+
+Need to look for mixture formulae.  Suggest we consider some of the formulae in Poling book that Shashank
+recommended.
 
 
 
