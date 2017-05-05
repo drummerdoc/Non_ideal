@@ -15,12 +15,13 @@
 %%height=10in,a5paper,hmargin={3cm,0.8in},
 %]{geometry}
 
-\usepackage{subfigure}
 \usepackage{longtable}
 \usepackage{lipsum}
 \usepackage{color}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{caption}
+\usepackage{subcaption}
 
 \newcommand{\comment}[1]{}
 
@@ -623,6 +624,7 @@ Following derivations presented in the book by Poling~\cite{poling2001properties
 A generalized cubic EOS in terms of compressibility factor, Z can be written as 
 \begin{equation}
 Z = \frac{V}{V-B_{m}} - \frac{\left(\Theta/RT\right) V}{\left(V^{2} - \delta V + \epsilon \right)}
+\label{eq:PReosCompressibility}
 \end{equation}
 where for
 \begin{enumerate} 
@@ -783,9 +785,129 @@ The other relationship relating $\kappa_{s}$ and $\kappa_{T}$ can be derived fro
     \begin{align}
     V_{,l} &= -\left(\frac{\partial V}{\partial P}\right)_{T,X} \left(\frac{R T}{V- B_{m}} + \frac{B_l R T}{\left(V-B_m\right)^2} - \frac{2 \sum_{k=1}^{N_{s}} A_{l,k} X_{k}}{V^2+ 2 B_{m} V - B_m^2} + \frac{\left(-B_m + V\right) 2 A_m B_l}{\left(V^2+ 2 B_{m} V - B_m^2 \right)^2} \right)
     \end{align}
-     \section{Additional derivatives}
-     In the previous two sections a few derivatives of the equation of state (EOS), in terms of P, T and V were left undefined. In this section closed form expressions for those derivatives are presented. 
-     
+    \section {P-R EOS vs NIST}
+    \label{sec:ComparePRvsNIST}
+    In the following section, comparison between various thermodynamics computed using Peng-Robinson (PR) EOS and NIST data, computed using much more advanced MWR EOS, are presented. 
+\begin{figure}[t!]
+    \centering
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=1.8in]{figures/N2_vsNIST_Density.png}
+        \caption{Density of nitrogen(N2) in [kg/$m^{3}$], as a function of Temperature at isobaric conditions, 60 bar}
+    \end{subfigure}%
+    ~ 
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=1.8in]{figures/N2_vsNIST_Cp.png}
+        \caption{Specific heat at constant pressure, Cp, of nitrogen(N2) in [J/g K], as a function of Temperature at isobaric conditions, 60 bar}
+    \end{subfigure}
+    \caption{Comparison of thermodynamic quantities (Density and Specific heat) computed using PR EOS against NIST}
+    \label{fig:DensityCpVsNIST}
+\end{figure}
+
+\begin{figure}[t!]
+    \centering
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=1.8in]{figures/N2_vsNIST_InternalEnergy.png}
+        \caption{Internal energy of nitrogen(N2) in [kJ/Kg], as a function of Temperature at isobaric conditions, 60 bar}
+    \end{subfigure}%
+    ~ 
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=1.8in]{figures/N2_vsNIST_Enthalpy.png}
+        \caption{Enthalpy of nitrogen(N2) in [kJ/Kg], as a function of Temperature at isobaric conditions, 60 bar}
+    \end{subfigure}
+    \caption{Comparison of thermodynamic quantities (Internal energy and Enthalpy) computed using PR EOS against NIST}
+    \label{fig:EnthalpyEnergyVsNIST}
+\end{figure}
+
+\section{Conversion between state variables}
+In order to test conversion between state variables, the data generated from PR-EOS presented in the previous section, Sec.~\ref{sec:ComparePRvsNIST} is relied upon. At first profiles of state variables, p, T, E and density, $\rho$
+are generated at iso-baric conditions, p = 60 [bar] as a function of temperature.  
+\subsection{Computing density and Internal energy given Pressure and Temperature}     
+Given Pressure, $P_{in}$ and Temperature, $T_{in}$, the compressibility factor is computed using Eq.~\ref{eq:PReosCompressibility}. Thereafter, density, $\rho$ is computed using relation the $\rho = \frac{p M}{Z R_u T}$, where $M$ is the molecular weight. Using derivatives of EOS parameters, departure functions and thus internal energy can be computed using Eq.~\ref{eq:internalEnergyFinal}. 
+\begin{align}
+\rho_{p,T} & = F(P_{in},T_{in}) \\
+e_{p,T} & = E(P_{in},T_{in})
+\end{align}
+Plots comparing the data obtained from PR EOS against NIST are shown in Figs.~\ref{fig:DensityCpVsNIST}\&\ref{fig:EnthalpyEnergyVsNIST}. 
+\subsection{Computing Pressure and Internal energy given Density and Temperature}  
+Pressure, p, can be very easily expressed as a function of $\rho$ and T by arranging the terms of PR EOS, as shown in the equation below. 
+\begin{align}
+p &= \frac{\rho R_{m} T}{1-\rho b_m} - \frac{\rho^{2} a_m}{1 + 2 \rho b_m - \rho^2 b_m^{2}} \\
+a &= A_m/M^2 \\
+b &= B_m/M \\
+R_m &= R_u/M
+\label{eq:PreosPrho}
+\end{align}
+In order to test the implementation of this form of EOS, density,$\rho_{p,T}$, and Temperature, $T_{in}$, from the previous section are used to compute pressure, $p_{\rho, T}$. This pressure is then compared against $P_{in}$ in Fig.~\ref{fig:PfromRHOT}. Once the parameters in the EOS are set, various derivatives of EOS can be computed to generate internal energy, $e_{\rho, T}$ which is compared against $e_{p,T}$, in Fig.~\ref{fig:EfromRHOT}. 
+\begin{figure}[!tbh]
+    \centering
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=1.8in]{figures/N2_NonLinear_PfromRHO_T.png}
+        \caption{Pressure of nitrogen(N2) in [bar], as a function of Temperature at isobaric conditions, 60 bar}
+        \label{fig:PfromRHOT}
+    \end{subfigure}%
+    ~ 
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=1.8in]{figures/N2_NonLinear_EfromRHO_T.png}
+        \caption{Internal energy of nitrogen(N2) in [kJ/kg], as a function of Temperature at isobaric conditions, 60 bar}
+        \label{fig:EfromRHOT}
+    \end{subfigure}
+    \caption{Conversion between state variables, Pressure, P and Internal Energy, E computed from PR EOS, given Density, $\rho$ and Temperature}
+\end{figure}
+\subsection{Computing Temperature and Internal energy given Pressure and density}  
+As can be observed from Eq.~\ref{eq:PReosCompressibility}, compressibility factor, Z is a non-linear function of temperature, T. For this reason a non-linear root solve algorithm needs to be implemented to compute the root of the following function, F. 
+\begin{align}
+F &= ZT - \frac{P M}{\rho R_u} \\
+G &= \frac{Z \rho R_u T}{M} - P 
+\end{align}
+where $\frac{P M}{\rho R_u}$ is known. This relationship can be recast as 
+\begin{align}
+G &= \frac{Z \rho R_u T}{M} - P 
+\end{align}
+This recasting allows us to easily calculate analytical derivative of G for implementation in a Newton-Raphson based root solve algorithm. The analytical derivative can be derived using Eq.~\ref{eq:PreosPrho} as following
+\begin{align}
+\frac{dG}{dT} = \left(\frac{\partial \rho}{\partial T} \right)_{\rho, X} = \frac{\rho R_m}{1-\rho b_m} - \frac{\rho^2 \frac{\partial a_m}{\partial T}}{1 + 2\rho b_m - \rho^2 b_m^{2}}
+\end{align}
+Using the ideal gas estimate of temperature as the initial guess, the Newton-Raphson based non-linear root solve algorithm converges to the expected solution,$T_{in}$. Fig.~\ref{fig:TEfromRHOP} shows the temperature comparison against $T_{in}$ and internal energy, $e_{P,\rho}$ against the internal energy, $e_{p,T}$ obtained using $P_{in}$ and Temperature, $T_{in}$. 
+\begin{figure}[!tbh]
+    \centering
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=1.8in]{figures/N2_NonLinear_TfromRHO_P.png}
+        \caption{Temperature of nitrogen(N2) in [K]}
+        \end{subfigure}%
+    ~ 
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=1.8in]{figures/N2_NonLinear_EfromRHO_P.png}
+        \caption{Internal energy of nitrogen(N2) in [kJ/kg], as a function of Temperature at isobaric conditions, 60 bar}
+    \end{subfigure}
+    \caption{Conversion between state variables, Temperature, T and Internal Energy, E computed from PR EOS, given Density, $\rho$ and Pressure}
+    \label{fig:TEfromRHOP}
+\end{figure}
+
+\subsection{Computing Pressure and Temperature given Density and Internal energy}  
+
+\begin{figure}[!tbh]
+    \centering
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=1.8in]{figures/N2_NonLinear_TfromRHO_E.png}
+        \caption{Temperature of nitrogen(N2) in [K]}
+    \end{subfigure}%
+    ~ 
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=1.8in]{figures/N2_NonLinear_PfromRHO_E.png}
+        \caption{Pressure of nitrogen(N2) in [bar], as a function of Temperature at isobaric conditions, 60 bar}
+    \end{subfigure}
+    \caption{Conversion between various state variables, Temperature, T and Pressure, P computed from PR EOS, given Density, $\rho$ and Internal energy, E}
+\end{figure}
 \section{Pragmatic summary}
 \label{sec:john_summ}
 
