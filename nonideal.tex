@@ -22,6 +22,13 @@
 \usepackage{amssymb}
 \usepackage{caption}
 \usepackage{subcaption}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+}
 
 \newcommand{\comment}[1]{}
 
@@ -892,7 +899,12 @@ Using the ideal gas estimate of temperature as the initial guess, the Newton-Rap
 \end{figure}
 
 \subsection{Computing Pressure and Temperature given Density and Internal energy}  
-
+Since the Eq.~\ref{eq:internalEnergyFinal} is only a function of density and Temperature, a non-linear root solve algorithm to calculate temperature from density and internal energy is first employed. Thereafter, Pressure is computed using density and temperature. Using the following relations, a non-linear root solve based on Newton-Raphson algorithm can be constructed
+\begin{align}
+G\left( T \right) &= e^{*} - e^{ig}\left(T\right) - \left[ A_m(T) - T\frac{\partial A_m}{\partial T}\right]K_{1}\left(\rho^{*}\right) \\
+\left(\frac{\partial G}{\partial T}\right)_{\rho} &= -C_v^{ig} + K_{1}\left(\rho^{*}\right) \left[T\frac{\partial^2 A_m}{\partial T^2} \right] 
+\end{align}
+where $e^{*}$ and $\rho^*$ are known quantities. 
 \begin{figure}[!tbh]
     \centering
     \begin{subfigure}[t]{0.5\textwidth}
