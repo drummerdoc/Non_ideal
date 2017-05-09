@@ -640,28 +640,39 @@ p = k_B T \sum \frac{Y_k}{m_k} \frac{1}{\tau - b_m} - \frac{a_m}{\tau(\tau + b_m
 \]
 Here $a_m = a_m(T, Y_k)$ and $b_m = b_m(Y_k)$
 \[
-a_m = (\mathcal{Y}\sqrt(a))^T  \mathcal{Y}\sqrt(a) \;\;\;  b_m = Y^T b
+%a_m = (\mathcal{Y}\sqrt(a))^T  \mathcal{Y}\sqrt(a) \;\;\;  b_m = Y^T b
+a_m = \sum_{ij} Y_i Y_j \alpha_i \alpha_j \;\;\;  b_m = \sum_k Y_k b_k
 \]
-were $a$ is the vector of species attractive parameters that are a function of temperature and are
-set in relation to the critical temperature and $b$ is the vector species repulsive forces which are
+were $\alpha_i$ are species attractive parameters that are a function of temperature and are
+set in relation to the critical temperature. and $b$ is the vector species repulsive forces which are
 constants (I think) that depend on critical point.
 See Giovangigli papers for form of these.
 
 Giovangigli carries out the derivation of some of the other quantities for SRK. For example,
 \[
-e = Y^T e^{id} + ( T \left . \frac{\partial a_m}{\partial T} \right |_{\rho,Y} - a_m)
+%e = Y^T e^{id} + ( T \left . \frac{\partial a_m}{\partial T} \right |_{\rho,Y} - a_m)
+%\frac{1}{b_m} ln ( 1 + \frac{b_m}{\tau})
+e_m = \sum_k Y_k e_k^{id} + \left( T \left . \frac{\partial a_m}{\partial T} \right |_{\rho,Y} - a_m \right)
 \frac{1}{b_m} ln ( 1 + \frac{b_m}{\tau})
 \]
-and
 \[
-h = Y^T h^{id} + ( T \left . \frac{\partial a_m}{\partial T} \right |_{\rho,Y} - a_m)
+s_m = \sum_k Y_k s_k^{id,*} - \sum_k \frac{Y_k k_b}{m_k} ln  \left( \frac{Y_k k_b T}{m_k (\tau -b_m) p^{st}}   \right )
++ \left . \frac{\partial a_m}{\partial T} \right |_{\rho,Y} \frac{1}{b_m} ln ( 1 + \frac{b_m}{\tau})
+\]
+where $p^{st}$ is the standard reference pressure
+\[
+h_m = \sum_k Y_k h_k^{id} + \left ( T \left . \frac{\partial a_m}{\partial T} \right |_{\rho,Y} - a_m \right)
 \frac{1}{b_m} ln ( 1 + \frac{b_m}{\tau})
 + 
 k_B T \sum \frac{Y_k}{m_k} \frac{b_m}{\tau -b_m} - \frac{b_m}{\tau(\tau + b_m)}
 \]
+\[
+\mu_k = \frac{\partial f}{\partial Y_k} \;\;\; \mathrm{where} \;\;\;  f = e_m - T s_m
+\]
 
-Tragically, this doesn't work for Peng-Robinson.  The integral doesn't appear to have a nice closed from solution, at leat as far as I can
-see.
+For Peng-Robinson, need to factor quadratic on bottom of second term and use partial fractions to do integrals, which is
+somewhat messier.
+
 \subsection{Peng-Robinson}
 
 Peng-Robinson (PR) EOS: $\delta = 2 B_{m}$, $\epsilon = -B_{m}^2$, $\Theta = A_{m} \alpha(T_{r})$. 
