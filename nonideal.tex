@@ -1240,20 +1240,22 @@ h_k = \left( \frac{\partial h_m}{\partial Y_k}\right)_{p,T,Y_j}
      \end{equation}
      \end{enumerate}
 \MarginPar{Make consistent with \ref{sec:mix}}
-     Following the discussion presented in~\cite{masquelet2013large}; the partial molar volumes computed using PR EOS
-     \begin{align}
+     Following the discussion presented in~\cite{masquelet2013large}; the partial molar volumes can be computed using 
+          \begin{align}
      V_{,l} &= \left(\frac{\partial \mathcal{V}}{\partial N_{l}} \right)_{T,P,N_{k,k\neq l}} \\
        &= \left(\frac{\partial \mathcal{V}}{\partial P} \right)_{T,N} \left(\frac{\partial P}{\partial N_{l}} \right)_{T,\mathcal{V},N_{k,k\neq l}}
        \label{eq:molarf}
      \end{align}
-     where $V$ is molar volume and $\mathcal{V}$ is total volume. In the case of PR EOS, pressure can be expressed in terms of total volume
+     where $V$ is molar volume and $\mathcal{V}$ is total volume. 
+     \begin{enumerate}
+     \item In the case of PR EOS, pressure can be expressed in terms of total volume
      \begin{equation}
      P = \frac{N R_u T}{\mathcal{V} - N B_{m}} - \frac{N^{2}A_{m}}{\mathcal{V}^{2}+2NB_{m}\mathcal{V}-N^{2}B_{m}^2}
      \end{equation}
      \begin{equation}
      P = \frac{R_u T}{V - B_{m}} - \frac{A_m}{V^{2}+2B_{m}V - B_{m}^2}
      \end{equation}
-      Evaluating the derivatives in Eq.~\ref{eq:molarf}
+      Evaluating the derivatives defined in Eq.~\ref{eq:molarf}
      \begin{align}
      \left(\frac{\partial P}{\partial \mathcal{V}}\right)_{T,N} &= -\frac{N R T}{\left(\mathcal{V}-NB_{m}\right)^{2}} + \frac{N^2 A_m \left(2\mathcal{V}+2N B_m\right)}{\left(\mathcal{V}^{2}+2NB_m\mathcal{V} - N^2B_m^2\right)^2} \\
 &=\frac{1}{N} \left(-\frac{R T}{\left(V-B_{m}\right)^{2}} + \frac{2A_m \left(V+B_m\right)}{\left(V^{2}+2B_m V-B_m^2\right)^2}\right) \\
@@ -1267,7 +1269,23 @@ h_k = \left( \frac{\partial h_m}{\partial Y_k}\right)_{p,T,Y_j}
     \begin{align}
     V_{,l} &= \left(\frac{\partial V}{\partial P}\right)_{T,N} \left(\frac{R T}{V- B_{m}} + \frac{B_l R T}{\left(V-B_m\right)^2} - \frac{2 \sum_{k=1}^{N_{s}} A_{l,k} X_{k}}{V^2+ 2 B_{m} V - B_m^2} + \frac{\left(-B_m + V\right) 2 A_m B_l}{\left(V^2+ 2 B_{m} V - B_m^2 \right)^2} \right)
     \end{align}
-
+    \item In the case of SRK EOS
+    \begin{align}
+    	P & = \frac{N R_u T}{\mathcal{V}-N B_m} - \frac{N^2 A_m}{\mathcal{V}^2+N B_m \mathcal{V}} \nonumber \\
+	   & = \frac{R_u T}{V-B_m} - \frac{A_m}{V^2+B_m V}
+    \end{align}
+    Evaluating the derivatives defined in Eq.~\ref{eq:molarf}
+    \begin{align}
+    \left(\frac{\partial P}{\partial \mathcal{V}} \right)_{T,N} & = -\frac{N R_u T}{\left(\mathcal{V}-N B_m\right)^2} + \frac{N^2 A_m \left(2\mathcal{V} + N B_m \right)}{\left(\mathcal{V}^2+N B_m \mathcal{V} \right)^2} \nonumber  \\
+                & = \frac{1}{N} \left(-\frac{R_u T}{\left(V-B_m \right)^2} + \frac{A_m\left(2V+B_m\right)}{\left(V^2 + V B_m\right)^2}\right) \\
+                & = \frac{1}{N} \left . \frac{\partial P}{\partial V} \right |_{T,X}
+    \end{align}
+    \begin{align} 
+     \left . \frac{\partial P}{\partial N_{l}} \right |_{T,\mathcal{V},N_{k,k\neq l}} &=  \frac{R_u T}{\mathcal{V}-N B_m} + \frac{N R_u T B_l}{\left(\mathcal{V}-N B_m\right)^2} \\
+     &- \frac{2 \sum_{k=1}^{N_s} A_{l,k} N_{k}}{\mathcal{V}^2 + N B_m \mathcal{V}} + \frac{N^2 A_m B_l \mathcal{V}}{\left(\mathcal{V}^2 + N B_m \mathcal{V} \right)^2}
+    \end{align}
+    
+\end{enumerate}
 
 \bibliographystyle{unsrt}% Produces the bibliography via BibTeX.
 \bibliography{nonideal_refs}% Produces the bibliography via BibTeX.
