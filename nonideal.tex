@@ -110,7 +110,7 @@ A list of specifics:
 \item Evaluate $p$ given $\rho$, $T$ and $Y_k$. This implicitly involves whatever mixing rules are used to
     evaluate repulsion and attraction terms in cubic EOS \ref{sec:eos}
 \item Evaluate sound speed, basically $\partial ln(p)/ \partial ln(\rho)$ at constant entropy and $Y_k$. This
-can be expressed in terms of other derivatives. Please see Sec.~\ref{sec:SpeedofSound}. 
+can be expressed in terms of other derivatives. Please see Eq.~\ref{eq:SpeedofSound}
 \item Need matrix of diffusion coefficients $\mathcal{D}$.  This typically requires binary diffusion coefficients and may involve high density corrections
 \item The matrix $\Gamma$ that represents nonideal chemical potential effect on transport
 \item The vector of $\theta$'s (or $\phi$'s) that represent volume fractions in barodiffusion
@@ -434,11 +434,11 @@ What Giovangigli does is to write thermodynamic quantities as
 
 For internal energy from the Helmholtz equation
 \begin{equation}
-\frac{\partial e_m}{\partial \tau} = T^2 \frac{\partial (\Phi/T)} {\partial T}
+\frac{\partial e}{\partial \tau} = T^2 \frac{\partial (\Phi/T)} {\partial T}
 \end{equation}
 If we use the above and note that $p^{id}/T$ is independent of $T$ then
 \begin{equation}
-\frac{\partial e_m}{\partial \tau} = e^{id}- \int_\tau^\infty  T^2 \frac{\partial (\Phi/T)} {\partial T} d\tau
+e = e^{id}- \int_\tau^\infty  T^2 \frac{\partial (\Phi/T)} {\partial T} d\tau
 \label{eq:energy_gen}
 \end{equation}
 
@@ -447,7 +447,12 @@ in which case the departure from ideal internal energy becomes, following deriva
 
 \begin{equation}
 \label{eq:DepartInternalEnergyIntegral}
-\frac{e^{ig}-e}{RT} = \int_{V}^{\infty} \left[ T \left(\frac{\partial Z}{\partial T}\right)_{V} \right] \frac{dV}{V}
+\frac{e^{ig}-e}{RT} = \int_{\tau}^{\infty} \left[ T \left(\frac{\partial Z}{\partial T}\right)_{\tau} \right] \frac{d\tau}{\tau}
+\end{equation}
+where \emph{compressibility factor}, $Z$ is defined as 
+\begin{equation}
+\Phi = \frac{Z R_u T}{\tau}
+\label{eq:compressibilityFactorinTau}
 \end{equation}
 \MarginPar{Definition of Z. Repl. $V$ to $\tau$}
 
@@ -510,12 +515,12 @@ s_m &=& s_m^{id} -
 In terms of the volume integral:
 \MarginPar{I think there is a typo here}
 \begin{equation}
-\frac{s^{ig}-s}{RT} = \frac{e^{ig}-e}{RT}  -  \frac{A^{ig}-A}{RT}
+\frac{s^{ig}-s}{R} = \frac{e^{ig}-e}{RT}  -  \frac{f^{ig}-f}{RT}
 \end{equation}
 
-where $A$ is the Helmholtz energy given by:
+where $f$ is the Helmholtz energy given by:
 \begin{equation}
-\frac{A^{ig}-A}{RT} = \int_{V}^{\infty} \left[1-Z\right]\frac{dV}{V} + ln Z
+\frac{f^{ig}-f}{RT} = \int_{\tau}^{\infty} \left[1-Z\right]\frac{d\tau}{\tau} + ln Z
 \end{equation}
 \MarginPar{notation. $A\rightarrow f$}
 
@@ -586,6 +591,7 @@ This can be address using
 In terms of compressibility factor:
 \begin{equation}
 \frac{h^{ig}-h}{RT} = \frac{e^{ig}-e}{RT}  + 1 - Z
+\label{eq:compressEnthalpyGeneral}
 \end{equation}
 \MarginPar{Notation and mixing rule discussion}
 
@@ -612,42 +618,50 @@ p^{id} = k_B T \sum \frac{Y_k}{m_k} \frac{1}{\tau}
 = k_B T \sum \frac{Y_k}{m_k} \frac{b_m}{\tau(\tau -b_m)} - \frac{a_m}{\phi(\tau)}
 \]
 
-These two equations of state can also be written in terms of a compressability factor Z:
+These two equations of state can also be written in terms of a compressibility factor Z:
 \begin{equation}
-Z = \frac{V}{V-B_{m}} - \frac{\left(\Theta/RT\right) V}{\left(V^{2} - \delta V + \epsilon \right)},
+Z = \frac{\tau}{\tau-b_{m}} - \frac{\left(\Theta/RT\right) \tau}{\left(\tau^{2} - \delta \tau + \epsilon \right)},
 \label{eq:PReosCompressibility}
 \end{equation}
 
 \MarginPar{Form of $A_m$ is not correct for mixtures i thnk}
 
-Using the forms from the previous section and this equation of state we can assemble expressions with some generality:
-
-Internal energy:
-\begin{equation}
-\label{eq:genericDepinteng}
-    e^{id} - e = 
-\end{equation}
-
-
-
-
+Using the forms from the previous section and this equation of state we can assemble expressions with some generality. 
+%
+%Internal energy:
+%\begin{equation}
+%\label{eq:genericDepinteng}
+%    e^{id} - e = 
+%\end{equation}
 \subsection{Soave-Redlich-Kwong}
 
 For SRK, $\phi(\tau) = \tau(\tau+b_m)$, or, in the compressibility factor 
-Redlich-Kwong (RK) EOS: $\delta = B_{m}$, $\epsilon = 0$, $\Theta = A_{m}/\sqrt{T_{r}}$ \MarginPar{fix to be SRK}
+Redlich-Kwong (RK) EOS: $\delta = B_{m}$, $\epsilon = 0$, $\Theta = a_{m}$ \MarginPar{fix to be SRK}
 \[
 p = k_B T \sum \frac{Y_k}{m_k} \frac{1}{\tau - b_m} - \frac{a_m}{\tau(\tau + b_m)}
 \]
 Here $a_m = a_m(T, Y_k)$ and $b_m = b_m(Y_k)$
 \[
 %a_m = (\mathcal{Y}\sqrt(a))^T  \mathcal{Y}\sqrt(a) \;\;\;  b_m = Y^T b
-a_m = \sum_{ij} Y_i Y_j \alpha_i \alpha_j \;\;\;  b_m = \sum_k Y_k b_k
+a_m = \sum_{ij} Y_i Y_j a_i a_j \;\;\;  b_m = \sum_k Y_k b_k
 \]
-were $\alpha_i$ are species attractive parameters that are a function of temperature and are
-set in relation to the critical temperature. and $b$ is the vector species repulsive forces which are
-constants (I think) that depend on critical point.
-See Giovangigli papers for form of these.
-
+were $a_i$ are species attractive parameters that are a function of temperature and are
+set in relation to the critical temperature. and $b$ is the vector species repulsive forces which depend on the critical point.
+Typically, $a_i$ and $b_i$ are defined using the critical quantities and temperature dependent correction factors~\cite{poling2001properties}:
+\begin{align}
+a_i &= a_i^{*}\left(T_{c,i},P_{c,i}\right) \alpha(T/T_{c,i})  \nonumber \\
+       &= 0.42748 \frac{\left(R_u T_{c,i} \right)^2}{p_{c,i}} \alpha \left(T/T_{c,i}\right)  \nonumber \\
+ b_i &= 0.08664 \frac{R_u T_{c,i}}{p_{c,i}}   
+       \label{eq:abformEOS}
+\end{align}
+where
+\[
+\alpha(T/T_{c,i}) = \left(1 + f\left( \omega_i \right) \left(1-\sqrt{T/T_{c,i}} \right) \right)^2
+\]
+and in terms of acentric factor $\omega_i$
+\[
+f\left( \omega_i \right) = 0.48508 + 1.5517 \omega_i - 0.151613 \omega_{i}^2
+\]
 Giovangigli carries out the derivation of some of the other quantities for SRK. For example,
 \[
 %e = Y^T e^{id} + ( T \left . \frac{\partial a_m}{\partial T} \right |_{\rho,Y} - a_m)
@@ -675,37 +689,25 @@ somewhat messier.
 
 \subsection{Peng-Robinson}
 
-Peng-Robinson (PR) EOS: $\delta = 2 B_{m}$, $\epsilon = -B_{m}^2$, $\Theta = A_{m} \alpha(T_{r})$. 
-
-A generalized cubic EOS in terms of compressibility factor, Z can be written as 
-where for
-
-
+Peng-Robinson (PR) EOS: $\delta = 2 b_{m}$, $\epsilon = -b_{m}^2$, $\Theta = a_{m}$ in the Eq.~\ref{eq:PReosCompressibility}. In the case of PR EOS the species attractive and repulsion factors $a_m$ and $b_m$ are expressed in the form similar to the SRK EOS, shown in the Eq.~\ref{eq:abformEOS}. The temperature correction factor $\alpha(T/T_{c,i})$ has the same form as SRK EOS. The functional form of $f\left( \omega_i \right)$, expressed as a polynomial in terms of the acentric factor, has a different form compared to SRK EOS. 
+\[
+f\left( \omega_i \right) = 0.379642 + 1.48503 \omega_i - 0.164423 \omega_i^2 + 0.016666 \omega_i^3
+\]
+In the following, closed form expressions for various thermodynamic quantities derived using PR EOS are listed. For detailed derivations please refer to Appendix~\ref{sec:AppdxInternalEnergy}
 \paragraph{Internal energy}
-
 \MarginPar{Go as far as possible with $\phi(\tau)$, move that to prev section; pick up from here with a particular $\phi{\tau}$}
 \begin{equation}
-\left(\frac{\partial Z}{\partial T}\right)_{V} = \left[ \frac{-V}{V^{2}+ 2V B_{m} - B_{m}^{2}}\right]\left[ \frac{\frac{\partial A_{m}}{\partial T}T -A_{m}}{R T^{2}}\right]
-\end{equation}
-\begin{align}
-e^{ig} - e & = T \int_{V}^{\infty} \left[ \frac{-1}{V^{2}+2 V B_{m}-B_{m}^{2}}\right] \left[ \frac{\partial A_{m}}{\partial T} - \frac{A_{m}}{T}\right] dV \\
-               & = \left[ -T \frac{\partial A_{m}}{\partial T} + A_{m}\right] \int_{V}^{\infty} \frac{dV}{\left[V+(1-\sqrt{2}) B_{m} \right] \left[ V+(1+\sqrt{2}) B_{m} \right]} \\
-               & = \left[ T \frac{\partial A_{m}}{\partial T} - A_{m}\right] \frac{1}{\sqrt{2}B_{m}} tanh^{-1}\left(\frac{V+B_{m}}{\sqrt{2}B_{m}}\right) \\
-               & = \left[ T \frac{\partial A_{m}}{\partial T} - A_{m}\right] \frac{1}{2 \sqrt{2}B_{m}} ln \left(\frac{V+(1-\sqrt{2}) B_{m}}{V+(1+\sqrt{2}) B_{m}}\right)
-\end{align}
-A quantity $K_{1}$ can be defined 
-\begin{equation}
-K_{1} = \frac{1}{\sqrt{2}B_{m}} tanh^{-1}\left(\frac{V+B_{m}}{\sqrt{2}B_{m}}\right)
-\end{equation}
-The internal energy departure function can be written as 
-\begin{equation}
-e^{ig} - e = \left[ T \frac{\partial A_{m}}{\partial T} - A_{m}\right] K_{1}
+e - e^{ig} = \left[ a_{m} -T \left . \frac{\partial a_{m}}{\partial T} \right |_{\rho,Y} \right] K_1
 \label{eq:internalEnergyFinal}
 \end{equation}
+where 
+\[
+K_1 = \frac{1}{2 \sqrt{2}b_{m}} ln \left(\frac{\tau+(1-\sqrt{2}) b_{m}}{\tau+(1+\sqrt{2}) b_{m}}\right)
+\]
 \paragraph{Enthalpy}
-
+Using the relationship between internal energy and enthalpy defined in Eq.~\ref{eq:compressEnthalpyGeneral}, the following closed form expression can be arrived at. 
 \begin{equation}
-h^{ig} - h = \left[ T \frac{\partial A_{m}}{\partial T} - A_{m}\right] K_{1} + (1 - Z) RT
+h^{ig} - h = \left[ T \left .  \frac{\partial a_{m}}{\partial T} \right |_{\rho,Y}- a_{m}\right] K_{1} + (1 - Z) RT
 \end{equation}
 
 \MarginPar{Check all this is ok with mixtures with derivatives $()_{V,Y}$; convert $V$ to $\tau$.}
@@ -721,48 +723,48 @@ c_v = \left( \frac{\partial e_m}{\partial T}\right)_{\tau,Y}
 \[
 c_p = \left( \frac{\partial h_m}{\partial T}\right)_{p,Y}
 \]
-Specific heat at constant Pressure, Cp: In order to calculate Temperature from enthalpy we would need an expression for Cp and to derive this expression we would rely on the equation for internal energy, Eq.~\ref{eq:internalEnergyFinal}
+Specific heat at constant Pressure, $c_p$: Detailed steps for deriving the relationship are outlined in Appendix~\ref{sec:AppdxSpecificHeat}. Here only the final expression is presented. 
 \begin{equation}
-C_{V} = \left(\frac{\partial e}{\partial T}\right)_{V} = C_{v}^{ig} - K1 \left[T \frac{\partial^{2} A_{m}}{\partial T^{2}} \right]
-\end{equation}
-\paragraph{Entropy}
-\begin{align}
-ds &= \left(\frac{\partial s}{\partial T}\right)_{V} dT + \left(\frac{\partial s}{\partial V}\right)_{T} dV \\
-   &= \frac{C_{v}}{T} dT + \left(\frac{\partial s}{\partial V}\right)_{T} dV \\
-   &= \left(\frac{\partial s}{\partial T}\right)_{V} dT + \left(\frac{\partial s}{\partial V}\right)_{T} \left( \left(\frac{\partial V}{\partial T}\right)_{P} dT + \left(\frac{\partial v}{\partial P} \right)_{T} dP \right)\\
-   &= \left(\left(\frac{\partial s}{\partial T}\right)_{V} + \left(\frac{\partial s}{\partial V}\right)_{T} \left(\frac{\partial V}{\partial T}\right)_{P} \right)dT + \left(\frac{\partial v}{\partial P} \right)_{T} dP \\
-   &= \left(\frac{\partial s}{\partial T}\right)_{P} dT + \left(\frac{\partial s}{\partial P}\right)_{T} dP \\
-   &= \frac{C_{P}}{T} dT + \left(\frac{\partial s}{\partial P}\right)_{T} dP \\
-\end{align}
-
-Using Maxwell relationships the relation between $C_{P}$ and $C_{V}$ can be established as following 
-\begin{align}
-C_{P} & = T\left(\frac{\partial s}{\partial T} \right)_{V} + T \left(\frac{\partial s}{\partial V} \right)_{T} \left(\frac{\partial V}{\partial T} \right)_{P} \\
-      & = C_{V} + T \left(\frac{\partial P}{\partial T} \right)_{V} \left(\frac{\partial V}{\partial T} \right)_{P} \\
-      & = C_{V} - T \left(\frac{\partial V}{\partial T} \right)_{P} \left(\frac{\partial P}{\partial V} \right)_{T} \left(\frac{\partial V}{\partial T} \right)_{P} \\
-      & = C_{V} - T\frac{\left(\frac{\partial V}{\partial T} \right)_{P}^{2}}{\left(\frac{\partial V}{\partial P} \right)_{T}} \\
-      & = C_{V} - T\frac{\left(\frac{\partial P}{\partial T} \right)_{V}^{2}}{\left(\frac{\partial P}{\partial V} \right)_{T}} 
-      \label{eq:CpCvReal}
-\end{align}
-In the case of ideal gas 
-\begin{equation}
-C_{P}^{ig} = C_{V}^{ig} - R
-\end{equation}
-Thus the final expression for $C_{P}$ is 
-\begin{equation}
-C_{P} = C_{P}^{ig} -R -K1 \left[T \frac{\partial^{2} A_{m}}{\partial T^{2}} \right] - T\left(\frac{\partial P}{\partial T}\right)^{2}_{V}/ \left(\frac{\partial P}{\partial V}\right)_{T}
+c_{p} = c_{p}^{ig} -R -K_1 \left[T \frac{\partial^{2} a_{m}}{\partial T^{2}} \right] - T\left(\frac{\partial P}{\partial T}\right)^{2}_{\tau}/ \left(\frac{\partial P}{\partial \tau}\right)_{T}
 \label{eq:CpRelation}
 \end{equation}
 
-Using the above presented form of EOS and departure functions defined in Eq.~\ref{eq:DepartInternalEnergyIntegral}, exact form of departure functions for cubic EOS can represented as the following 
+\paragraph{Speed of Sound}
 
+The first adiabatic exponent
+\[
+\Gamma_1 = \frac{c_p}{c_v} \frac{\rho}{p} 
+\left( \frac{\partial p}{\partial \rho}\right)_{T,Y}
+\]
+Sound speed is then $(\Gamma_1 p / \rho)^\half$. The other way of calculating speed of sound is by calculating the isentropic compressibility factor, $\kappa_s$. In terms of $\kappa_s$, the speed of sound can be calculated as  
+     \[    a^{2} = \frac{1}{\rho \kappa_{s}} \label{eq:SpeedofSound}   \]
+  
+ For PR EOS, $\kappa_s$ can be computed using the expression presented below. Please see appendix~\ref{sec:AppdxSpeedofSound} for details. 
+   
+\[     \kappa_{s} = \frac{-1}{\tau \left(\frac{\partial P}{\partial \tau} \right)_{T} } - \frac{\tau T \alpha_{V}^{2}}{c_{p}}   \]
+    and 
+\[ \alpha_{V} = \frac{-1}{\tau} \frac{\left(\frac{\partial P}{\partial T} \right)_{\tau}}{\left(\frac{\partial P}{\partial \tau} \right)_{T} } \]
+\paragraph{Partial enthalpies}
+    
+% \section{Derivatives of EOS}
+%As can be observed in the previous section, the expressions for all the quantities were left in the form of derivatives of $a_m$, $\left(\frac{\partial P}{\partial \tau} \right)_{T}$ and $\left(\frac{\partial P}{\partial T} \right)_{\tau}$. In the following section, closed form expressions for these derivatives for both SRK and PR EOS are derived. 
+%\subsection*{SRK}
+%
+%\subsection*{PR}
+%\begin{enumerate}
+%\item $ \left . \frac{\partial a_m}{\partial T} \right|_{\tau,Y} $
+%\begin{equation}
+%\left . \frac{\partial a_m}{\partial T} \right|_{\tau,Y} = \left . \frac{\partial a_m}{\partial T} \right|_{\tau,X} = \frac{-1}{T} \sum_{i}^{N_s} \sum_{i}^{N_s} X_i X_j a_{ij} \frac{ f \left( \omega_{ij} \right) \sqrt{ \frac{T}{ T_{c,ij} } } } { 1 + f \left( \omega_{ij} \right) \left( 1- \sqrt{\frac{T}{ T_{c,ij} } } \right) } 
+%\end{equation}
+%\item $ \left . \frac{\partial^2 a_m}{\partial T^2} \right|_{\tau,Y} $
+%\end{enumerate} 
 \section{Mixing Rules}
 \label{sec:mix}
 
 Require some heureistic mixing rules.
-  Specifically, $a_m$ depends on $T$ and composition and $b_m$ depdends of composition.  Composiiton
+  Specifically, $a_m$ depends on $T$ and composition and $b_m$ depends of composition.  Composition
 can be expressed in terms of $Y_k$ or $X_k$.  I would suggest for the moment we use the mass weighted
-mixing rules as per Poling 5.5.2b and 5.5.3.  These make some of the formulae (particularly chemical
+mixing rules as per Poling 5.5.2b and 5.5.3 (Poling proposes molefraction based mixing rules).  These make some of the formulae (particularly chemical
 potentials) simpler.  
 \begin{equation}
     a_m = M_a(T, Y) \sim 
@@ -771,100 +773,15 @@ potentials) simpler.
 \begin{equation}
     b_m = M_b(Y) \sim 
 \end{equation}
-
-
-\section{Speed of Sound}\label{sec:SpeedofSound}
-
-The first adiabatic exponent
-\[
-\Gamma_1 = \frac{c_p}{c_v} \frac{\rho}{p} 
-\left( \frac{\partial p}{\partial \rho}\right)_{T,Y}
-\]
-Sound speed is then $(\Gamma_1 p / \rho)^\half$.
-For deriving relationship for speed of sound, we first will define isentropic and isothermal compressibility factors, $\kappa_{s}$ and $\kappa_{T}$ respectively. The speed of sound is defined as $a^{2} = \frac{1}{\rho \kappa_{s}}$
-The isentropic compressibility factor is defined as 
-\MarginPar{consistencify}
+According to Poling 5.5.2b and 5.5.3
 \begin{equation}
-\kappa_{s} = \frac{-1}{V} \left(\frac{\partial V}{\partial P} \right)_{s} 
+    a_m = \sum_{i=1}^{ns}  \sum_{i=1}^{ns} x_i x_j a_{ij}
 \end{equation}
-and the isothermal compressibility factor is defined as 
-\begin{equation}
-\kappa_{T} = \frac{-1}{V} \left(\frac{\partial V}{\partial P} \right)_{T}
-\end{equation}
-Manipulating the relationship for $\kappa_{s}$, we can link $\kappa_{s}$ and $\kappa_{T}$ as following 
-\begin{align}
-\kappa_{s} &= \frac{-1}{V} \left(\frac{\partial V}{\partial P} \right)_{s} \\
-           &= \frac{-1}{V} \left(-\frac{\left(\frac{\partial s}{\partial P}\right)_V}{\left(\frac{\partial s}{\partial V} \right)_P} \right) \\
-           &= \frac{-1}{V} \left( -\frac{\left(\frac{\partial s}{\partial T}\right)_V \left(\frac{\partial T}{\partial P}\right)_V}{\left(\frac{\partial s}{\partial T} \right)_P \left(\frac{\partial T}{\partial V} \right)_P}  \right) \\
-           &= \frac{C_{V}}{C_{P}V} \left(\frac{\left(\frac{\partial T}{\partial P}\right)_V}{\left(\frac{\partial T}{\partial V} \right)_P}  \right) \\
-           & = \frac{C_{V}}{C_{P}}\kappa_{T} 
-           \label{eq:CpCvKappa}
-           \end{align}
-The other relationship relating $\kappa_{s}$ and $\kappa_{T}$ can be derived from Eq.~\ref{eq:CpCvReal}. In order to derive that relationship, a quantity known as thermal expansion coefficient ($\alpha_{V}$) needs to be introduced. 
-\begin{align}
-\alpha_{V} &= \frac{1}{V} \left(\frac{\partial V}{\partial T} \right)_{P} \\
-           &= \frac{-1}{V} \frac{\left(\frac{\partial P}{\partial T} \right)_{V}}{\left(\frac{\partial P}{\partial V} \right)_{T} }
-           \label{eq:expansivity}
-           \end{align}
-       Using Eqs.~\ref{eq:CpCvReal}, \ref{eq:CpCvKappa} and~\ref{eq:expansivity} we can calculate $\kappa_{s}$ as the following 
-   \begin{equation}
-    \kappa_{s} = \kappa_{T} - \frac{V T \alpha_{V}^{2}}{C_{P}}
-    \end{equation}
-    and 
-       \begin{equation}
-    \kappa_{T} =  \frac{-1}{V \left(\frac{\partial P}{\partial V} \right)_{T} }
-    \end{equation}
-    As mentioned previously the speed of sound is 
-     \begin{equation}
-     a^{2} = \frac{1}{\rho \kappa_{s}}
-     \end{equation}
-\section{Partial molar enthalpies}
-     \label{sec:PartialEnthalpies}
-\[
-h_k = \left( \frac{\partial h_m}{\partial Y_k}\right)_{p,T,Y_j}
-\]
-\MarginPar{Want h in kJ/kg, not per mole at end of analysis.}
 
-     In this section expressions for partial molar enthalpies are derived. Partial molar quantities, $F_{,l}$ are defined from the total mixture quantity, $F$ as 
-     \begin{equation}
-     F_{,l}\left(T,P, X_{k}\right) = \left( \frac{\partial F}{\partial N_{l}}\right)_{T,P,N_{k,k\neq l}}
-     \end{equation}
-     Additionally a few consequences of this definition are 
-     \begin{enumerate}
-     \item Gibbs-Duhem equation
-     \begin{equation}
-     \sum_{l=1}^{N_{s}} X_{l} dF_{,l} + \left(\frac{\partial F}{\partial T} \right)_{P,X_{k}} dT + \left(\frac{\partial F}{\partial P} \right)_{T,X_{k}} dP = 0
-     \end{equation}
-     \item Additive rule
-     \begin{equation}
-     F\left(T,P,X_{k} \right) = \sum_{l=1}^{N_{s}} X_{l} F_{,l}\left(T,P,X_{k}\right)
-     \end{equation}
-     \end{enumerate}
-\MarginPar{Make consistent with \ref{sec:mix}}
-     Following the discussion presented in~\cite{masquelet2013large}; the partial molar volumes computed using PR EOS
-     \begin{align}
-     V_{,l} &= \left(\frac{\partial \mathcal{V}}{\partial N_{l}} \right)_{T,P,N_{k,k\neq l}} \\
-       &= \left(\frac{\partial \mathcal{V}}{\partial P} \right)_{T,N} \left(\frac{\partial P}{\partial N_{l}} \right)_{T,\mathcal{V},N_{k,k\neq l}}
-       \label{eq:molarf}
-     \end{align}
-     where $V$ is molar volume and $\mathcal{V}$ is total volume. In the case of PR EOS, pressure can be expressed in terms of total volume
-     \begin{equation}
-     P = \frac{N R T}{\mathcal{V} - N B_{m}} - \frac{N^{2}A_{m}}{\mathcal{V}^{2}+2NB_{m}\mathcal{V}-N^{2}B_{m}^2}
-     \end{equation}
-     Evaluating the derivatives in Eq.~\ref{eq:molarf}
-     \begin{align}
-     \left(\frac{\partial P}{\partial \mathcal{V}}\right)_{T,N} &= -\frac{N R T}{\left(\mathcal{V}-NB_{m}\right)^{2}} - \frac{N^2 A_m \left(2\mathcal{V}+2N B_m\right)}{\left(\mathcal{V}^{2}+2NB_m\mathcal{V} - N^2B_m^2\right)^2} \\
-&=\frac{1}{N} \left(-\frac{R T}{\left(V-B_{m}\right)^{2}} - \frac{2A_m \left(V+B_m\right)}{\left(V^{2}+2B_m V-B_m^2\right)^2}\right) \\
-& = \frac{1}{N}\left(\frac{\partial P}{\partial V}\right)_{T,N}
-     \end{align}
-     \begin{align}
-     \left(\frac{\partial P}{\partial N_{l}} \right)_{T,\mathcal{V},N_{k,k\neq l}} &= \frac{R T}{\mathcal{V}- N B_{m}} + \frac{B_l N R T}{\left(\mathcal{V}-N B_m\right)^2} - \frac{2 \sum_{k=1}^{N_{s}} A_{l,k} N_{k}}{\mathcal{V}^2+ 2 N B_{m} \mathcal{V} - N^2 B_m^2}  \nonumber \\
- &+ \frac{\left(-2N B_m B_l + 2\mathcal{V} B_l\right)N^2 A_m}{\left(\mathcal{V}^2+ 2 N B_{m} \mathcal{V} - N^2 B_m^2 \right)^2}
-     \end{align}
-    Inserting both the derivatives into Eq.~\ref{eq:molarf}
-    \begin{align}
-    V_{,l} &= -\left(\frac{\partial V}{\partial P}\right)_{T,X} \left(\frac{R T}{V- B_{m}} + \frac{B_l R T}{\left(V-B_m\right)^2} - \frac{2 \sum_{k=1}^{N_{s}} A_{l,k} X_{k}}{V^2+ 2 B_{m} V - B_m^2} + \frac{\left(-B_m + V\right) 2 A_m B_l}{\left(V^2+ 2 B_{m} V - B_m^2 \right)^2} \right)
-    \end{align}
+\begin{equation}
+    b_m = \sum_{i=1}^{ns}  \sum_{i=1}^{ns} x_i b_i
+\end{equation}
+where $x_i$ is the molefraction of species $i$. 
 
 \section{Kinetics}
 
@@ -1084,8 +1001,6 @@ For polyatomic they suggest
 
 Need to look for mixture formulae.  Suggest we consider some of the formulae in Poling book that Shashank
 recommended.
-
-
     \section{Implementation}
     \subsection {P-R EOS vs NIST}
     \label{sec:ComparePRvsNIST}
@@ -1216,7 +1131,142 @@ where $e^{*}$ and $\rho^*$ are known quantities.
     \end{subfigure}
     \caption{Conversion between various state variables, Temperature, T and Pressure, P computed from PR EOS, given Density, $\rho$ and Internal energy, E}
 \end{figure}
+\appendix
+\section{PR EOS thermodynamic quantities}
+\subsection*{Internal energy}
+\label{sec:AppdxInternalEnergy}
+\begin{equation}
+\left(\frac{\partial Z}{\partial T}\right)_{\tau} = \left[ \frac{-\tau}{\tau^{2}+ 2\tau b_m - b_m^{2}}\right]\left[ \frac{ \left . \frac{\partial a_{m}}{\partial T} \right |_{\rho,Y}T -a_{m}}{R T^{2}}\right]
+\end{equation}
+\begin{align}
+e^{ig} - e & = T \int_{\tau}^{\infty} \left[ \frac{-1}{\tau^{2}+2 \tau b_m-b_m^{2}}\right] \left[ \left . \frac{\partial a_{m}}{\partial T} \right |_{\rho,Y} - \frac{a_{m}}{T}\right] d\tau \\
+               & = \left[ -T \left . \frac{\partial a_{m}}{\partial T} \right |_{\rho,Y} + a_{m}\right] \int_{\tau}^{\infty} \frac{d\tau}{\left[\tau+(1-\sqrt{2}) b_{m} \right] \left[ \tau+(1+\sqrt{2}) b_{m} \right]} \\
+               & = \left[ T \left . \frac{\partial a_{m}}{\partial T} \right |_{\rho,Y} - a_{m}\right] \frac{1}{\sqrt{2}b_{m}} tanh^{-1}\left(\frac{\tau+b_{m}}{\sqrt{2}b_{m}}\right) \\
+               & = \left[ T \left . \frac{\partial a_{m}}{\partial T} \right |_{\rho,Y} - a_{m}\right] \frac{1}{2 \sqrt{2}b_{m}} ln \left(\frac{\tau+(1-\sqrt{2}) b_{m}}{\tau+(1+\sqrt{2}) b_{m}}\right)
+\end{align}
+A quantity $K_1$ can be defined 
+\begin{equation}
+K_1 = \frac{1}{2 \sqrt{2}b_{m}} ln \left(\frac{\tau+(1-\sqrt{2}) b_{m}}{\tau+(1+\sqrt{2}) b_{m}}\right)
+\end{equation}
+The internal energy departure function can be written as 
+\begin{equation}
+e^{ig} - e = \left[ T \left . \frac{\partial a_{m}}{\partial T} \right |_{\rho,Y} - a_{m}\right] K_1
+\label{eq:internalEnergyFinal}
+\end{equation}
+\subsection*{Specific heat, $c_{p}$}
+\label{sec:AppdxSpecificHeat}
+ In order to calculate Temperature from enthalpy we would need an expression for Cp and to derive this expression we would rely on the equation for internal energy, Eq.~\ref{eq:internalEnergyFinal}
+\begin{equation}
+c_{v} = \left(\frac{\partial e}{\partial T}\right)_{\tau,Y} = c_{v}^{ig} - K_1 \left[T \frac{\partial^{2} a_{m}}{\partial T^{2}} \right]
+\end{equation}
+\paragraph{Entropy}
+\begin{align}
+ds &= \left(\frac{\partial s}{\partial T}\right)_{\tau} dT + \left(\frac{\partial s}{\partial \tau}\right)_{T} d\tau \\
+   &= \frac{c_{v}}{T} dT + \left(\frac{\partial s}{\partial \tau}\right)_{T} d\tau \\
+   &= \left(\frac{\partial s}{\partial T}\right)_{\tau} dT + \left(\frac{\partial s}{\partial \tau}\right)_{T} \left( \left(\frac{\partial \tau}{\partial T}\right)_{P} dT + \left(\frac{\partial \tau}{\partial P} \right)_{T} dP \right)\\
+   &= \left(\left(\frac{\partial s}{\partial T}\right)_{\tau} + \left(\frac{\partial s}{\partial \tau}\right)_{T} \left(\frac{\partial \tau}{\partial T}\right)_{P} \right)dT + \left(\frac{\partial \tau}{\partial P} \right)_{T} dP \\
+   &= \left(\frac{\partial s}{\partial T}\right)_{P} dT + \left(\frac{\partial s}{\partial P}\right)_{T} dP \\
+   &= \frac{c_{p}}{T} dT + \left(\frac{\partial s}{\partial P}\right)_{T} dP \\
+\end{align}
 
+Using Maxwell relationships the relation between $c_{p}$ and $c_{v}$ can be established as following 
+\begin{align}
+c_{p} & = T\left(\frac{\partial s}{\partial T} \right)_{\tau} + T \left(\frac{\partial s}{\partial \tau} \right)_{T} \left(\frac{\partial \tau}{\partial T} \right)_{P} \\
+      & = c_{v} + T \left(\frac{\partial P}{\partial T} \right)_{\tau} \left(\frac{\partial \tau}{\partial T} \right)_{P} \\
+      & = c_{v} - T \left(\frac{\partial \tau}{\partial T} \right)_{P} \left(\frac{\partial P}{\partial \tau} \right)_{T} \left(\frac{\partial \tau}{\partial T} \right)_{P} \\
+      & = c_{v} - T\frac{\left(\frac{\partial \tau}{\partial T} \right)_{P}^{2}}{\left(\frac{\partial \tau}{\partial P} \right)_{T}} \\
+      & = c_{v} - T\frac{\left(\frac{\partial P}{\partial T} \right)_{\tau}^{2}}{\left(\frac{\partial P}{\partial \tau} \right)_{T}} 
+      \label{eq:CpCvReal}
+\end{align}
+In the case of ideal gas 
+\begin{equation}
+c_{p}^{ig} = c_{v}^{ig} - R
+\end{equation}
+\subsection*{Speed of Sound}
+\label{sec:AppdxSpeedofSound}
+For deriving relationship for speed of sound, we first will define isentropic and isothermal compressibility factors, $\kappa_{s}$ and $\kappa_{T}$ respectively. The speed of sound is defined as $a^{2} = \frac{1}{\rho \kappa_{s}}$
+The isentropic compressibility factor is defined as 
+\MarginPar{consistencify}
+\begin{equation}
+\kappa_{s} = \frac{-1}{\tau} \left(\frac{\partial \tau}{\partial P} \right)_{s} 
+\end{equation}
+and the isothermal compressibility factor is defined as 
+\begin{equation}
+\kappa_{T} = \frac{-1}{\tau} \left(\frac{\partial \tau}{\partial P} \right)_{T}
+\end{equation}
+Manipulating the relationship for $\kappa_{s}$, we can link $\kappa_{s}$ and $\kappa_{T}$ as following 
+\begin{align}
+\kappa_{s} &= \frac{-1}{\tau} \left(\frac{\partial \tau}{\partial P} \right)_{s} \\
+           &= \frac{-1}{\tau} \left(-\frac{\left(\frac{\partial s}{\partial P}\right)_\tau}{\left(\frac{\partial s}{\partial \tau} \right)_P} \right) \\
+           &= \frac{-1}{\tau} \left( -\frac{\left(\frac{\partial s}{\partial T}\right)_\tau \left(\frac{\partial T}{\partial P}\right)_\tau}{\left(\frac{\partial s}{\partial T} \right)_P \left(\frac{\partial T}{\partial \tau} \right)_P}  \right) \\
+           &= \frac{c_{v}}{c_{p}\tau} \left(\frac{\left(\frac{\partial T}{\partial P}\right)_\tau}{\left(\frac{\partial T}{\partial \tau} \right)_P}  \right) \\
+           & = \frac{c_{v}}{c_{p}}\kappa_{T} 
+           \label{eq:CpCvKappa}
+           \end{align}
+The other relationship relating $\kappa_{s}$ and $\kappa_{T}$ can be derived from Eq.~\ref{eq:CpCvReal}. In order to derive that relationship, a quantity known as thermal expansion coefficient ($\alpha_{V}$) needs to be introduced. 
+\begin{align}
+\alpha_{V} &= \frac{1}{\tau} \left(\frac{\partial \tau}{\partial T} \right)_{P} \\
+           &= \frac{-1}{\tau} \frac{\left(\frac{\partial P}{\partial T} \right)_{\tau}}{\left(\frac{\partial P}{\partial \tau} \right)_{T} }
+           \label{eq:expansivity}
+           \end{align}
+       Using Eqs.~\ref{eq:CpCvReal}, \ref{eq:CpCvKappa} and~\ref{eq:expansivity} we can calculate $\kappa_{s}$ as the following 
+   \begin{equation}
+    \kappa_{s} = \kappa_{T} - \frac{\tau T \alpha_{V}^{2}}{c_{p}}
+    \end{equation}
+    and 
+       \begin{equation}
+    \kappa_{T} =  \frac{-1}{\tau \left(\frac{\partial P}{\partial \tau} \right)_{T} }
+    \end{equation}
+\subsection*{Partial volumes and enthalpies}
+    \label{sec:AppdxPartialEnthalpies}
+\[
+h_k = \left( \frac{\partial h_m}{\partial Y_k}\right)_{p,T,Y_j}
+\]
+\MarginPar{Want h in kJ/kg, not per mole at end of analysis.}
+
+     In this section expressions for partial molar enthalpies are derived. Partial molar quantities, $F_{,l}$ are defined from the total mixture quantity, $F$ as 
+     \begin{equation}
+     F_{,l}\left(T,P, X_{k}\right) = \left( \frac{\partial F}{\partial N_{l}}\right)_{T,P,N_{k,k\neq l}}
+     \end{equation}
+     Additionally a few consequences of this definition are 
+     \begin{enumerate}
+     \item Gibbs-Duhem equation
+     \begin{equation}
+     \sum_{l=1}^{N_{s}} X_{l} dF_{,l} + \left(\frac{\partial F}{\partial T} \right)_{P,X_{k}} dT + \left(\frac{\partial F}{\partial P} \right)_{T,X_{k}} dP = 0
+     \end{equation}
+     \item Additive rule
+     \begin{equation}
+     F\left(T,P,X_{k} \right) = \sum_{l=1}^{N_{s}} X_{l} F_{,l}\left(T,P,X_{k}\right)
+     \end{equation}
+     \end{enumerate}
+\MarginPar{Make consistent with \ref{sec:mix}}
+     Following the discussion presented in~\cite{masquelet2013large}; the partial molar volumes computed using PR EOS
+     \begin{align}
+     V_{,l} &= \left(\frac{\partial \mathcal{V}}{\partial N_{l}} \right)_{T,P,N_{k,k\neq l}} \\
+       &= \left(\frac{\partial \mathcal{V}}{\partial P} \right)_{T,N} \left(\frac{\partial P}{\partial N_{l}} \right)_{T,\mathcal{V},N_{k,k\neq l}}
+       \label{eq:molarf}
+     \end{align}
+     where $V$ is molar volume and $\mathcal{V}$ is total volume. In the case of PR EOS, pressure can be expressed in terms of total volume
+     \begin{equation}
+     P = \frac{N R_u T}{\mathcal{V} - N B_{m}} - \frac{N^{2}A_{m}}{\mathcal{V}^{2}+2NB_{m}\mathcal{V}-N^{2}B_{m}^2}
+     \end{equation}
+     \begin{equation}
+     P = \frac{R_u T}{V - B_{m}} - \frac{A_m}{V^{2}+2B_{m}V - B_{m}^2}
+     \end{equation}
+      Evaluating the derivatives in Eq.~\ref{eq:molarf}
+     \begin{align}
+     \left(\frac{\partial P}{\partial \mathcal{V}}\right)_{T,N} &= -\frac{N R T}{\left(\mathcal{V}-NB_{m}\right)^{2}} + \frac{N^2 A_m \left(2\mathcal{V}+2N B_m\right)}{\left(\mathcal{V}^{2}+2NB_m\mathcal{V} - N^2B_m^2\right)^2} \\
+&=\frac{1}{N} \left(-\frac{R T}{\left(V-B_{m}\right)^{2}} + \frac{2A_m \left(V+B_m\right)}{\left(V^{2}+2B_m V-B_m^2\right)^2}\right) \\
+& = \frac{1}{N}\left(\frac{\partial P}{\partial V}\right)_{T,N}
+     \end{align}
+     \begin{align}
+     \left(\frac{\partial P}{\partial N_{l}} \right)_{T,\mathcal{V},N_{k,k\neq l}} &= \frac{R T}{\mathcal{V}- N B_{m}} + \frac{B_l N R T}{\left(\mathcal{V}-N B_m\right)^2} - \frac{2 \sum_{k=1}^{N_{s}} A_{l,k} N_{k}}{\mathcal{V}^2+ 2 N B_{m} \mathcal{V} - N^2 B_m^2}  \nonumber \\
+ &+ \frac{\left(-2N B_m B_l + 2\mathcal{V} B_l\right)N^2 A_m}{\left(\mathcal{V}^2+ 2 N B_{m} \mathcal{V} - N^2 B_m^2 \right)^2}
+     \end{align}
+    Inserting both the derivatives into Eq.~\ref{eq:molarf}
+    \begin{align}
+    V_{,l} &= \left(\frac{\partial V}{\partial P}\right)_{T,N} \left(\frac{R T}{V- B_{m}} + \frac{B_l R T}{\left(V-B_m\right)^2} - \frac{2 \sum_{k=1}^{N_{s}} A_{l,k} X_{k}}{V^2+ 2 B_{m} V - B_m^2} + \frac{\left(-B_m + V\right) 2 A_m B_l}{\left(V^2+ 2 B_{m} V - B_m^2 \right)^2} \right)
+    \end{align}
 
 
 \bibliographystyle{unsrt}% Produces the bibliography via BibTeX.
