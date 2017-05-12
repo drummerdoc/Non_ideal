@@ -38,6 +38,8 @@
 \raggedright\tiny\sffamily
 \hrule\smallskip{\color{red}#1}\par\smallskip\hrule}}
 
+\newcommand{\jbb}[1]{{\bf[{\color{red}{JBB:  #1}}]}}
+
 
 
 \newcommand{\HeatFlux}{\boldsymbol{\mathcal{Q}}}
@@ -580,14 +582,16 @@ h_k = \left. \frac{\partial h}{\partial Y_k} \right|_{T,p}
 \]
 The natural form given by the Giovangigli approach gives things as a function of $\rho$, $T$ and $Y_k$.
 This can be address using
-\[
+\begin{equation}
 \frac{\partial h}{\partial (T,Y,p)}
 = \frac{\partial h}{\partial (T,Y,\rho)}
 \frac{\partial (T,Y,\rho)}{\partial (T,Y,p)}
 = \frac{\partial h}{\partial (T,Y,\rho)}
 \left (\frac{\partial (T,Y,p)}{\partial (T,Y,\rho)} \right)^{-1}
-\]
+\label{eq:calc_cov}
+\end{equation}
 
+\jbb{this is unncessarily obtuse.  $h = e + p/\rho$.}
 In terms of compressibility factor:
 \begin{equation}
 \frac{h^{ig}-h}{RT} = \frac{e^{ig}-e}{RT}  + 1 - Z
@@ -658,6 +662,7 @@ where
 \[
 \alpha(T/T_{c,i}) = \left(1 + f\left( \omega_i \right) \left(1-\sqrt{T/T_{c,i}} \right) \right)^2
 \]
+\jbb{One would like to use a mollified version of the $\alpha$ to smooth behavior near critical point}
 and in terms of acentric factor $\omega_i$
 \[
 f\left( \omega_i \right) = 0.48508 + 1.5517 \omega_i - 0.151613 \omega_{i}^2
@@ -700,12 +705,16 @@ In the following, closed form expressions for various thermodynamic quantities d
 e - e^{ig} = \left[ a_{m} -T \left . \frac{\partial a_{m}}{\partial T} \right |_{\rho,Y} \right] K_1
 \label{eq:internalEnergyFinal}
 \end{equation}
+\jbb{Note that one does not need to introduce $Z$ to do this.  Integrals can be done by partical fractions
+for Peng Robinson using formalism above.  Just messier the log term below because roots of quadratic are not 
+as simple.}
 where 
 \[
 K_1 = \frac{1}{2 \sqrt{2}b_{m}} ln \left(\frac{\tau+(1-\sqrt{2}) b_{m}}{\tau+(1+\sqrt{2}) b_{m}}\right)
 \]
 \paragraph{Enthalpy}
 Using the relationship between internal energy and enthalpy defined in Eq.~\ref{eq:compressEnthalpyGeneral}, the following closed form expression can be arrived at. 
+\jbb{$ h = e + p/\rho = e + p \tau$}
 \begin{equation}
 h^{ig} - h = \left[ T \left .  \frac{\partial a_{m}}{\partial T} \right |_{\rho,Y}- a_{m}\right] K_{1} + (1 - Z) RT
 \end{equation}
@@ -723,6 +732,7 @@ c_v = \left( \frac{\partial e_m}{\partial T}\right)_{\tau,Y}
 \[
 c_p = \left( \frac{\partial h_m}{\partial T}\right)_{p,Y}
 \]
+\jbb{You do not need a complex derivation here.  Result follows directly from (\ref{eq:calc_cov}).}
 Specific heat at constant Pressure, $c_p$: Detailed steps for deriving the relationship are outlined in Appendix~\ref{sec:AppdxSpecificHeat}. Here only the final expression is presented. 
 \begin{equation}
 c_{p} = c_{p}^{ig} -R -K_1 \left[T \frac{\partial^{2} a_{m}}{\partial T^{2}} \right] - T\left(\frac{\partial P}{\partial T}\right)^{2}_{\tau}/ \left(\frac{\partial P}{\partial \tau}\right)_{T}
@@ -736,6 +746,8 @@ The first adiabatic exponent
 \Gamma_1 = \frac{c_p}{c_v} \frac{\rho}{p} 
 \left( \frac{\partial p}{\partial \rho}\right)_{T,Y}
 \]
+\jbb{This formula is general for all EOS that give $p$ as a function of $\rho$ and $T$. No special derviation 
+is needed for PR.  Just evaluate formula.}
 Sound speed is then $(\Gamma_1 p / \rho)^\half$. The other way of calculating speed of sound is by calculating the isentropic compressibility factor, $\kappa_s$. In terms of $\kappa_s$, the speed of sound can be calculated as  
      \[    a^{2} = \frac{1}{\rho \kappa_{s}} \label{eq:SpeedofSound}   \]
   
@@ -745,6 +757,8 @@ Sound speed is then $(\Gamma_1 p / \rho)^\half$. The other way of calculating sp
     and 
 \[ \alpha_{V} = \frac{-1}{\tau} \frac{\left(\frac{\partial P}{\partial T} \right)_{\tau}}{\left(\frac{\partial P}{\partial \tau} \right)_{T} } \]
 \paragraph{Partial enthalpies}
+
+\jbb{The partial enthalpies can be computed directly from enthalpy using (\ref{eq:calc_cov})}
     
 % \section{Derivatives of EOS}
 %As can be observed in the previous section, the expressions for all the quantities were left in the form of derivatives of $a_m$, $\left(\frac{\partial P}{\partial \tau} \right)_{T}$ and $\left(\frac{\partial P}{\partial T} \right)_{\tau}$. In the following section, closed form expressions for these derivatives for both SRK and PR EOS are derived. 
@@ -782,6 +796,9 @@ According to Poling 5.5.2b and 5.5.3
     b_m = \sum_{i=1}^{ns}  \sum_{i=1}^{ns} x_i b_i
 \end{equation}
 where $x_i$ is the molefraction of species $i$. 
+
+\jbb{Different people in the literature use different mixing rules. Some based on $Y_k$ and some
+based on $X_k$.  Not sure which is better but algebra is cleaner for $Y_k$.}
 
 \section{Kinetics}
 
