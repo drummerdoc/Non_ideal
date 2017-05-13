@@ -456,6 +456,13 @@ where \emph{compressibility factor}, $Z$ is defined as
 \Phi = \frac{Z R_u T}{\tau}
 \label{eq:compressibilityFactorinTau}
 \end{equation}
+\jbb{I thought $Z$ was basically $p/p^{id}$.  in which case
+\[
+p - p^{id} = \Phi \rightarrow \Phi = (Z-1)p^{id} \rightarrow Z
+= 1+\frac{\Phi \mbar}{\rho k_b T}
+= 1+\frac{\Phi \overline{W}}{\rho R T}
+\]
+}
 \MarginPar{Definition of Z. Repl. $V$ to $\tau$}
 
 
@@ -644,10 +651,18 @@ Redlich-Kwong (RK) EOS: $\delta = B_{m}$, $\epsilon = 0$, $\Theta = a_{m}$ \Marg
 \[
 p = k_B T \sum \frac{Y_k}{m_k} \frac{1}{\tau - b_m} - \frac{a_m}{\tau(\tau + b_m)}
 \]
-Here $a_m = a_m(T, Y_k)$ and $b_m = b_m(Y_k)$
+Giovangigli uses $a_m = a_m(T, Y_k)$ and $b_m = b_m(Y_k)$
+with mixing rules
 \[
 %a_m = (\mathcal{Y}\sqrt(a))^T  \mathcal{Y}\sqrt(a) \;\;\;  b_m = Y^T b
 a_m = \sum_{ij} Y_i Y_j a_i a_j \;\;\;  b_m = \sum_k Y_k b_k
+\]
+It turns out as noted by Shashank that this is not standard. \jbb{My bad.}
+It looks like it is better to write
+Here $a_m = a_m(T, X_k)$ and $b_m = b_m(X_k)$
+\[
+%a_m = (\mathcal{Y}\sqrt(a))^T  \mathcal{Y}\sqrt(a) \;\;\;  b_m = Y^T b
+a_m = \sum_{ij} X_i X_j a_i a_j \;\;\;  b_m = \sum_k X_k b_k
 \]
 were $a_i$ are species attractive parameters that are a function of temperature and are
 set in relation to the critical temperature. and $b$ is the vector species repulsive forces which depend on the critical point.
@@ -797,8 +812,14 @@ According to Poling 5.5.2b and 5.5.3
 \end{equation}
 where $x_i$ is the molefraction of species $i$. 
 
-\jbb{Different people in the literature use different mixing rules. Some based on $Y_k$ and some
-based on $X_k$.  Not sure which is better but algebra is cleaner for $Y_k$.}
+\jbb{seems like we should be working in this form.
+
+We will still need gradients wrt $Y_k$.  This is best done using 
+\[
+\nabla_Y a(X,T) = \nabla_X a(X,T) \frac{\partial X}{\partial Y} = \frac{\partial a}{\partial X}
+(\mathcal{Y}- Y Y^T ) \mathcal{X}^{-1}
+\]
+}
 
 \section{Kinetics}
 
