@@ -462,6 +462,9 @@ p - p^{id} = \Phi \rightarrow \Phi = (Z-1)p^{id} \rightarrow Z
 = 1+\frac{\Phi \mbar}{\rho k_b T}
 = 1+\frac{\Phi \overline{W}}{\rho R T}
 \]
+In (\ref{eq:DepartInternalEnegeryIntegral}), $R$ should be $R/\overline{W}$.  
+(We should try to reserve $R$ for universal gas constant.)
+Then the two forms are identical.  
 }
 \MarginPar{Definition of Z. Repl. $V$ to $\tau$}
 
@@ -748,6 +751,12 @@ c_v = \left( \frac{\partial e_m}{\partial T}\right)_{\tau,Y}
 c_p = \left( \frac{\partial h_m}{\partial T}\right)_{p,Y}
 \]
 \jbb{You do not need a complex derivation here.  Result follows directly from (\ref{eq:calc_cov}).}
+\[
+c_p = \left. \frac{\partial h_m}{\partial T} \right |_{Y,\rho}
+- \frac {\frac{\partial h}{\partial \rho}} 
+ {\frac{\partial p}{\partial \rho}}
+\left. \frac{\partial p}{\partial T} \right |_{Y,\rho}
+\]
 Specific heat at constant Pressure, $c_p$: Detailed steps for deriving the relationship are outlined in Appendix~\ref{sec:AppdxSpecificHeat}. Here only the final expression is presented. 
 \begin{equation}
 c_{p} = c_{p}^{ig} -R -K_1 \left[T \frac{\partial^{2} a_{m}}{\partial T^{2}} \right] - T\left(\frac{\partial P}{\partial T}\right)^{2}_{\tau}/ \left(\frac{\partial P}{\partial \tau}\right)_{T}
@@ -774,6 +783,13 @@ Sound speed is then $(\Gamma_1 p / \rho)^\half$. The other way of calculating sp
 \paragraph{Partial enthalpies}
 
 \jbb{The partial enthalpies can be computed directly from enthalpy using (\ref{eq:calc_cov})}
+Specifically here
+\[
+h_k = \left. \frac{\partial h}{\partial Y_k} \right |_{T,\rho}
+- \frac {\frac{\partial h}{\partial \rho}} 
+ {\frac{\partial p}{\partial \rho}}
+\left. \frac{\partial p}{\partial Y_k} \right |_{T,\rho}
+\]
     
 % \section{Derivatives of EOS}
 %As can be observed in the previous section, the expressions for all the quantities were left in the form of derivatives of $a_m$, $\left(\frac{\partial P}{\partial \tau} \right)_{T}$ and $\left(\frac{\partial P}{\partial T} \right)_{\tau}$. In the following section, closed form expressions for these derivatives for both SRK and PR EOS are derived. 
