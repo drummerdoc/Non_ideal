@@ -90,7 +90,7 @@ April 19, 2017
 
 \section{Approach}
 \subsection{Action Items}
-\begin{dictionary}
+\begin{description}
     \item[JBB] Write out reaction rate formalism in form of \ref{eq:rxn_corr} and fix that equation
     \item[RWG] Check on Hari's availablity to work on Fuego / rxn rate corrections
     \item[MSD] Check if we actually need $c_v$ anywhere in PeleC
@@ -101,7 +101,95 @@ April 19, 2017
     \item[MSD] Provide feedback on implementation as it proceeds (also w.r.t. eventual use in PeleLM)
     \item[RG] Also provide feedback in implementation as it proceeds
     \item[ALL] Provde feedback through Pele slack \#nonideal channel 
-\end{dictionary}
+\end{description}
+
+\section{Things to compute}
+Need software to be able to compute the following things; the below is a template for what needs to be implemented. 
+
+Derivatves of attractive parameters:
+\[
+\frac{\partial a_m}{\partial Y_k} \quad \frac{\partial a_m}{\partial T} \quad \frac{\partial b_m}{\partial Y_k} \quad \frac{\partial^2 a_m}{\partial T^2}
+\]
+
+Derivatives of state variables
+\[
+\quad \frac{\partial p}{\partial \tau}, \quad \frac{\partial p}{\partial T}
+\]
+
+Mixing rules:
+\[
+b_m(Y_i,b_i) \qquad a_m(Y_i,a_i)
+\]
+
+Evaluation of energies for individual species:
+\[
+h_k(Y, T, \rho) = h_k^{id}(T) + h_k^{dep}(Y,T,\rho)
+\]
+\[
+e_k(Y, T, \rho) = e_k^{id}(T) + e_k^{dep}(Y,T,\rho)
+\]
+
+Mixture energies:
+\[
+e_m(Y, T, \rho) = \left[e_m^{id} = \sum_k Y_Ke_k^{id}\right] + e_m^{dep}(Y,T,\rho)
+\]
+\[
+h_m(Y, T, \rho) = \left[h_m^{id} = \sum_k Y_Kh_k^{id}\right] + h_m^{dep}(Y,T,\rho)
+\]
+Specific heats, from \ref{eq:CpRelation} after suitable checks and the equivalent for $c_v$:
+\[
+c_p 
+\]
+\[
+c_v \quad 
+\]\MarginPar{check if we really need $c_v$}
+Routines to compute T given the state and either internal energy or enthalpy via a solve using either Newton or Secant method (start with Secant):
+\[
+T(e_m,Y,\rho), \quad T(h_m,Y,\rho)
+\]
+
+Sound speed:
+\[
+a
+\]
+
+Pressure:
+\[
+p = p^{id}(\rho, Y, T) + \Phi,  \qquad \Phi(\rho, Y, T)
+\]
+
+Chemical potentials:
+\[
+\mu = \left(\frac{\partial f}{\partial Y}\right)_{\tau,T,Y}
+\]
+
+Perturbations (multiplicative) to reaction rates (JBB developing):
+\[
+R_k(T,Y,\rho) = R_k^{id}(T,Y_k,\rho)\gamma_k^{dep}(T,Y,\rho)
+\]
+\MarginPar{JBB to do some deep thoughts here\ldots}
+
+Transport changes --- compute new driving force:
+\[
+\left(\frac{\partial \tau}{\partial Y}\right)_{T,p}
+\]
+Use derivatives to compute $\theta$ and hence $\phi$.
+
+Smoothed chemical potentials:
+\[
+\mu^{sm}
+\]
+And eventually driving force that can be added to ideal driving force:
+\[
+d
+\]
+
+\begin{itemize}
+    \item This all takes some sort of parser to read in critical properties for those that we have and estimate those that we do not (Shashank and Emmanuel coordinating)
+    \item Possibly can generate some of these from LJ potentials that are already computed through the 'convert' gizmo
+    \item Giovangigli has published trans-critical $H_2$-$O_2$ flame that we could use for validation 
+    
+\end{itemize}
 
 
 
