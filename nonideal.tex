@@ -447,6 +447,8 @@ e = e^{id}- \int_\tau^\infty  T^2 \frac{\partial (\Phi/T)} {\partial T} d\tau
 Alternatively, the engineering community often works in terms of the \emph{compressibility factor}, $Z$, 
 in which case the departure from ideal internal energy becomes, following derivations in the book by Poling~\cite{poling2001properties}:
 
+\MarginPar{MAke this $R$ be $R/W$}
+
 \begin{equation}
 \label{eq:DepartInternalEnergyIntegral}
 \frac{e^{ig}-e}{RT} = \int_{\tau}^{\infty} \left[ T \left(\frac{\partial Z}{\partial T}\right)_{\tau} \right] \frac{d\tau}{\tau}
@@ -588,18 +590,18 @@ An issue is that it gives things as function of $\rho$, $T$ and $Y$.  One of the
 things we need to construct the energy flux is $h_k$, the species enthalpies.
 Those are given by 
 \[
-h_k = \left. \frac{\partial h}{\partial Y_k} \right|_{T,p}
+h_k = \left. \frac{\partial h}{\partial Y_k} \right|_{T,p,Y_{k\ne l}}
 \]
-The natural form given by the Giovangigli approach gives things as a function of $\rho$, $T$ and $Y_k$.
-This can be address using
-\begin{equation}
-\frac{\partial h}{\partial (T,Y,p)}
-= \frac{\partial h}{\partial (T,Y,\rho)}
-\frac{\partial (T,Y,\rho)}{\partial (T,Y,p)}
-= \frac{\partial h}{\partial (T,Y,\rho)}
-\left (\frac{\partial (T,Y,p)}{\partial (T,Y,\rho)} \right)^{-1}
-\label{eq:calc_cov}
-\end{equation}
+%The natural form given by the Giovangigli approach gives things as a function of $\rho$, $T$ and $Y_k$.
+%This can be address using
+%\begin{equation}
+%\frac{\partial h}{\partial (T,Y,p)}
+%= \frac{\partial h}{\partial (T,Y,\rho)}
+%\frac{\partial (T,Y,\rho)}{\partial (T,Y,p)}
+%= \frac{\partial h}{\partial (T,Y,\rho)}
+%\left (\frac{\partial (T,Y,p)}{\partial (T,Y,\rho)} \right)^{-1}
+%\label{eq:calc_cov}
+%\end{equation}
 
 \jbb{this is unncessarily obtuse.  $h = e + p/\rho$.}
 In terms of compressibility factor:
@@ -638,7 +640,7 @@ Z = \frac{\tau}{\tau-b_{m}} - \frac{\left(\Theta/RT\right) \tau}{\left(\tau^{2} 
 \label{eq:PReosCompressibility}
 \end{equation}
 
-\MarginPar{Form of $A_m$ is not correct for mixtures i thnk}
+%\MarginPar{Form of $A_m$ is not correct for mixtures i thnk}
 
 Using the forms from the previous section and this equation of state we can assemble expressions with some generality. 
 %
@@ -723,9 +725,9 @@ In the following, closed form expressions for various thermodynamic quantities d
 e - e^{ig} = \left[ a_{m} -T \left . \frac{\partial a_{m}}{\partial T} \right |_{\rho,Y} \right] K_1
 \label{eq:internalEnergyFinal}
 \end{equation}
-\jbb{Note that one does not need to introduce $Z$ to do this.  Integrals can be done by partical fractions
-for Peng Robinson using formalism above.  Just messier the log term below because roots of quadratic are not 
-as simple.}
+%\jbb{Note that one does not need to introduce $Z$ to do this.  Integrals can be done by partical fractions
+%for Peng Robinson using formalism above.  Just messier the log term below because roots of quadratic are not 
+%as simple.}
 where 
 \[
 K_1 = \frac{1}{2 \sqrt{2}b_{m}} ln \left(\frac{\tau+(1-\sqrt{2}) b_{m}}{\tau+(1+\sqrt{2}) b_{m}}\right)
@@ -733,8 +735,9 @@ K_1 = \frac{1}{2 \sqrt{2}b_{m}} ln \left(\frac{\tau+(1-\sqrt{2}) b_{m}}{\tau+(1+
 \paragraph{Enthalpy}
 Using the relationship between internal energy and enthalpy defined in Eq.~\ref{eq:compressEnthalpyGeneral}, the following closed form expression can be arrived at. 
 \jbb{$ h = e + p/\rho = e + p \tau$}
+\MarginPar{check minus sign in eq.}
 \begin{equation}
-h^{ig} - h = \left[ T \left .  \frac{\partial a_{m}}{\partial T} \right |_{\rho,Y}- a_{m}\right] K_{1} + (1 - Z) RT
+h^{ig} - h = \left[ T \left .  \frac{\partial a_{m}}{\partial T} \right |_{\rho,Y}- a_{m}\right] K_{1} + (-?)\Phi\tau% (1 - Z) RT
 \end{equation}
 
 \MarginPar{Check all this is ok with mixtures with derivatives $()_{V,Y}$; convert $V$ to $\tau$.}
@@ -758,20 +761,22 @@ c_p = \left. \frac{\partial h_m}{\partial T} \right |_{Y,\rho}
 \left. \frac{\partial p}{\partial T} \right |_{Y,\rho}
 \]
 Specific heat at constant Pressure, $c_p$: Detailed steps for deriving the relationship are outlined in Appendix~\ref{sec:AppdxSpecificHeat}. Here only the final expression is presented. 
+\MarginPar{Subst. expressions for deriv. in eq at bottom of pg. 13}
 \begin{equation}
-c_{p} = c_{p}^{ig} -R -K_1 \left[T \frac{\partial^{2} a_{m}}{\partial T^{2}} \right] - T\left(\frac{\partial P}{\partial T}\right)^{2}_{\tau}/ \left(\frac{\partial P}{\partial \tau}\right)_{T}
+c_{p} = c_{p}^{ig} -R -K_1 \left[T \frac{\partial^{2} a_{m}}{\partial T^{2}} \right] - T\left(\frac{\partial P}{\partial T}\right)^{2}_{\tau,Y}/ \left(\frac{\partial P}{\partial \tau}\right)_{T,Y}
 \label{eq:CpRelation}
 \end{equation}
 
 \paragraph{Speed of Sound}
 
-The first adiabatic exponent
-\[
-\Gamma_1 = \frac{c_p}{c_v} \frac{\rho}{p} 
-\left( \frac{\partial p}{\partial \rho}\right)_{T,Y}
-\]
-\jbb{This formula is general for all EOS that give $p$ as a function of $\rho$ and $T$. No special derviation 
-is needed for PR.  Just evaluate formula.}
+%The first adiabatic exponent
+%\[
+%\Gamma_1 = \frac{c_p}{c_v} \frac{\rho}{p} 
+%\left( \frac{\partial p}{\partial \rho}\right)_{T,Y}
+%\]
+%\jbb{This formula is general for all EOS that give $p$ as a function of $\rho$ and $T$. No special derviation 
+%is needed for PR.  Just evaluate formula.} 
+\MarginPar{Show that this is the same as $\Gamma_1$ based formula}
 Sound speed is then $(\Gamma_1 p / \rho)^\half$. The other way of calculating speed of sound is by calculating the isentropic compressibility factor, $\kappa_s$. In terms of $\kappa_s$, the speed of sound can be calculated as  
      \[    a^{2} = \frac{1}{\rho \kappa_{s}} \label{eq:SpeedofSound}   \]
   
@@ -805,6 +810,7 @@ h_k = \left. \frac{\partial h}{\partial Y_k} \right |_{T,\rho}
 %\end{enumerate} 
 \section{Mixing Rules}
 \label{sec:mix}
+
 
 Require some heureistic mixing rules.
   Specifically, $a_m$ depends on $T$ and composition and $b_m$ depends of composition.  Composition
@@ -990,7 +996,7 @@ and we define
 \]
 We then define the thermodynamic driving force
 \[
-d = \nabla X  + \frac{\overline{W}}{R T} \mathcal{W} \mathcal{Y} \nabla_{T,p} \; \mu^{sm}  \frac{\mbar}{\rho k_B T} (\phi - Y) \nabla p
+d = \nabla X  + \frac{\overline{W}}{R T} \mathcal{W} \mathcal{Y} \nabla_{T,p} \; \mu^{sm}  + \frac{\mbar}{\rho k_B T} (\phi - Y) \nabla p
 \]
 and
 \[
@@ -1016,6 +1022,7 @@ The $\Upsilon$ are given in \cite{KurochkinETAL:1984}.
 See Eq. (35) in \cite{giovangigli_CTM:2011}.
 
 Thermal conductivity can be given as
+\MarginPar{Need to figure out how to evaluate the things appearing here - and to determine if they matter - Shashank making plots from NIST to see if they do}
 \[
 \lambda = \lambda^{dil} \beta + \lambda^{hp}
 \]
@@ -1055,6 +1062,93 @@ For polyatomic they suggest
 
 Need to look for mixture formulae.  Suggest we consider some of the formulae in Poling book that Shashank
 recommended.
+\section{Things to compute}
+Need software to be able to compute the following things; the below is a template for what needs to be implemented. 
+
+Derivatves of attractive parameters:
+\[
+\frac{\partial a_m}{\partial Y_k} \quad \frac{\partial a_m}{\partial T} \quad \frac{\partial b_m}{\partial Y_k} \quad \frac{\partial^2 a_m}{\partial T^2}
+\]
+
+Derivatives of state variables
+\[
+\quad \frac{\partial p}{\partial \tau}, \quad \frac{\partial p}{\partial T}
+\]
+
+Mixing rules:
+\[
+b_m(Y_i,b_i) \qquad a_m(Y_i,a_i)
+\]
+
+Evaluation of energies for individual species:
+\[
+h_k(Y, T, \rho) = h_k^{id}(T) + h_k^{dep}(Y,T,\rho)
+\]
+\[
+e_k(Y, T, \rho) = e_k^{id}(T) + e_k^{dep}(Y,T,\rho)
+\]
+
+Mixture energies:
+\[
+e_m(Y, T, \rho) = \left[e_m^{id} = \sum_k Y_Ke_k^{id}\right] + e_m^{dep}(Y,T,\rho)
+\]
+\[
+h_m(Y, T, \rho) = \left[h_m^{id} = \sum_k Y_Kh_k^{id}\right] + h_m^{dep}(Y,T,\rho)
+\]
+Specific heats, from \ref{eq:CpRelation} after suitable checks and the equivalent for $c_v$:
+\[
+c_p 
+\]
+\[
+c_v \quad 
+\]\MarginPar{check if we really need $c_v$}
+Routines to compute T given the state and either internal energy or enthalpy via a solve using either Newton or Secant method (start with Secant):
+\[
+T(e_m,Y,\rho), \quad T(h_m,Y,\rho)
+\]
+
+Sound speed:
+\[
+a
+\]
+
+Pressure:
+\[
+p = p^{id}(\rho, Y, T) + \Phi,  \qquad \Phi(\rho, Y, T)
+\]
+
+Chemical potentials:
+\[
+\mu = \left(\frac{\partial f}{\partial Y}\right)_{\tau,T,Y}
+\]
+
+Perturbations (multiplicative) to reaction rates (JBB developing):
+\[
+R_k(T,Y,\rho) = R_k^{id}(T,Y_k,\rho)\gamma_k^{dep}(T,Y,\rho)
+\]
+\MarginPar{JBB to do some deep thoughts here\ldots}
+
+Transport changes --- compute new driving force:
+\[
+\left(\frac{\partial \tau}{\partial Y}\right)_{T,p}
+\]
+Use derivatives to compute $\theta$ and hence $\phi$.
+
+Smoothed chemical potentials:
+\[
+\mu^{sm}
+\]
+And eventually driving force that can be added to ideal driving force:
+\[
+d
+\]
+
+\begin{itemize}
+    \item This all takes some sort of parser to read in critical properties for those that we have and estimate those that we do not (Shashank and Emmanuel coordinating)
+    \item Possibly can generate some of these from LJ potentials that are already computed through the 'convert' gizmo
+    \item Giovangigli has published trans-critical $H_2$-$O_2$ flame that we could use for validation 
+    \
+\end{itemize}
     \section{Implementation}
     \subsection {P-R EOS vs NIST}
     \label{sec:ComparePRvsNIST}
