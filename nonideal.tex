@@ -23,6 +23,7 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{hyperref}
+\usepackage{ulem}
 \hypersetup{
     colorlinks=true,
     linkcolor=blue,
@@ -87,11 +88,24 @@ Shashank Yellapantula
 April 19, 2017
 \end{center}
 
-\section{TODO: what we need to integrate compressible flow equations}
+\section{Approach}
+\subsection{Action Items}
+\begin{dictionary}
+    \item[JBB] Write out reaction rate formalism in form of \ref{eq:rxn_corr} and fix that equation
+    \item[RWG] Check on Hari's availablity to work on Fuego / rxn rate corrections
+    \item[MSD] Check if we actually need $c_v$ anywhere in PeleC
+    \item[SY] Generate plots of bulk and shear viscosity vs. T at multiple P (or vs. P at fixed T) from NIST database 
+    \item[SY] Contact EM to discuss what has been done w.r.t. reading in $T_c$, $P_c$ for species and interfacing with LJ potentials to estimate those not available
+    \item[HS] Set up branch for Fuego mods
+    \item[SY] Implement the functionality in Section \ref{sec:api} pertaining to state thermodynamics; please update document with routine name for each when done
+    \item[MSD] Provide feedback on implementation as it proceeds (also w.r.t. eventual use in PeleLM)
+    \item[RG] Also provide feedback in implementation as it proceeds
+    \item[ALL] Provde feedback through Pele slack \#nonideal channel 
+\end{dictionary}
 
 
 
-Guiding principles:
+\subsection{Guiding principles}
 \begin{itemize}
     \item For convenience in the code, they need to be in terms of specific quantities. (Here $\tau$ is specific volume.)
     \item We want to consider cubic equations of state, either SRK or PR. 
@@ -107,20 +121,20 @@ Guiding principles:
         The integrals for SRK are easy when $\tau > b_m$.  PR integrals are uglier.  
 \end{itemize}
 
-A list of specifics:
+\subsection{A list of specifics}
 \begin{itemize}
 \item Evaluate $p$ given $\rho$, $T$ and $Y_k$. This implicitly involves whatever mixing rules are used to
-    evaluate repulsion and attraction terms in cubic EOS \ref{sec:eos}
+    evaluate repulsion and attraction terms in cubic EOS \ref{sec:eos}, specifically Eqs. \ref{eq:pSRK} and \ref{eq:pPR}
 \item Evaluate sound speed, basically $\partial ln(p)/ \partial ln(\rho)$ at constant entropy and $Y_k$. This
 can be expressed in terms of other derivatives. Please see Eq.~\ref{eq:SpeedofSound}
-\item Need matrix of diffusion coefficients $\mathcal{D}$.  This typically requires binary diffusion coefficients and may involve high density corrections
-\item The matrix $\Gamma$ that represents nonideal chemical potential effect on transport
-\item The vector of $\theta$'s (or $\phi$'s) that represent volume fractions in barodiffusion
-\item Need vector of rescaled thermal diffusion ratios $\tilde{\chi}$ (if you want Soret and Dufour)
-\item Thermal conductivity $\lambda$ and viscosity coefficients $\eta$ and $\kappa$
-\item The species enthalpies $h_k$ that are need to form energy diffusive flux. Please see Sec.~\ref{sec:PartialEnthalpies}. 
-\item The species chemical potentials that are needed for chemistry
-\item A specification of chmical rates
+\item Need matrix of diffusion coefficients $\mathcal{D}$.  This typically requires binary diffusion coefficients and may involve high density corrections; see Eq \ref{eq:Dij}.
+\item The matrix $\Gamma$ that represents nonideal chemical potential effect on transport. This is contained in \ref{eq:muk_sm}
+\item The vector of $\theta$'s (or $\phi$'s) that represent volume fractions in barodiffusion (Eq.~\ref{eq:transp_gradp_multiplier})
+\item \sout{Need vector of rescaled thermal diffusion ratios $\tilde{\chi}$ (if you want Soret and Dufour)}{\it Deferred until we have a handle on non-ideal effects without these}
+\item \sout{Thermal conductivity $\lambda$ and viscosity coefficients $\eta$ and $\kappa$} {\it Deferred until we know that non-ideal effects make a noticible difference there.}
+\item The species enthalpies $h_k$ that are need to form energy diffusive flux. (Eq. \ref{eq:hmSRK}, \ref{eq:hkPR}; implemented in the form of \ref{eq:hk})
+\item The species chemical potentials that are needed for chemistry (\ref{eq:NIpotential})
+\item A specification of chemical rates (see Sec. \ref{sec:kinetics})
 \item One probably needs specific heats, at least to compute thermal diffusion time step limit. Please see Eq.~\ref{eq:CpRelation}
 \end{itemize}
 
@@ -654,6 +668,7 @@ Using the forms from the previous section and this equation of state we can asse
 For SRK, $\phi(\tau) = \tau(\tau+b_m)$, or, in the compressibility factor 
 Redlich-Kwong (RK) EOS: $\delta = B_{m}$, $\epsilon = 0$, $\Theta = a_{m}$ \MarginPar{fix to be SRK}
 \[
+\label{eq:pSRK}
 p = k_B T \sum \frac{Y_k}{m_k} \frac{1}{\tau - b_m} - \frac{a_m}{\tau(\tau + b_m)}
 \]
 Giovangigli uses $a_m = a_m(T, Y_k)$ and $b_m = b_m(Y_k)$
@@ -700,6 +715,7 @@ s_m = \sum_k Y_k s_k^{id,*} - \sum_k \frac{Y_k k_b}{m_k} ln  \left( \frac{Y_k k_
 \]
 where $p^{st}$ is the standard reference pressure
 \[
+\label{eq:hmSRK}
 h_m = \sum_k Y_k h_k^{id} + \left ( T \left . \frac{\partial a_m}{\partial T} \right |_{\rho,Y} - a_m \right)
 \frac{1}{b_m} ln ( 1 + \frac{b_m}{\tau})
 + 
@@ -714,7 +730,13 @@ somewhat messier.
 
 \subsection{Peng-Robinson}
 
-Peng-Robinson (PR) EOS: $\delta = 2 b_{m}$, $\epsilon = -b_{m}^2$, $\Theta = a_{m}$ in the Eq.~\ref{eq:PReosCompressibility}. In the case of PR EOS the species attractive and repulsion factors $a_m$ and $b_m$ are expressed in the form similar to the SRK EOS, shown in the Eq.~\ref{eq:abformEOS}. The temperature correction factor $\alpha(T/T_{c,i})$ has the same form as SRK EOS. The functional form of $f\left( \omega_i \right)$, expressed as a polynomial in terms of the acentric factor, has a different form compared to SRK EOS. 
+Peng-Robinson (PR) EOS: $\delta = 2 b_{m}$, $\epsilon = -b_{m}^2$, $\Theta = a_{m}$ in the Eq.~\ref{eq:PReosCompressibility}:
+\[
+\label{eq:pPR}
+p = 
+\]
+
+ In the case of PR EOS the species attractive and repulsion factors $a_m$ and $b_m$ are expressed in the form similar to the SRK EOS, shown in the Eq.~\ref{eq:abformEOS}. The temperature correction factor $\alpha(T/T_{c,i})$ has the same form as SRK EOS. The functional form of $f\left( \omega_i \right)$, expressed as a polynomial in terms of the acentric factor, has a different form compared to SRK EOS. 
 \[
 f\left( \omega_i \right) = 0.379642 + 1.48503 \omega_i - 0.164423 \omega_i^2 + 0.016666 \omega_i^3
 \]
@@ -790,6 +812,7 @@ Sound speed is then $(\Gamma_1 p / \rho)^\half$. The other way of calculating sp
 \jbb{The partial enthalpies can be computed directly from enthalpy using (\ref{eq:calc_cov})}
 Specifically here
 \[
+\label{eq:hkPR}
 h_k = \left. \frac{\partial h}{\partial Y_k} \right |_{T,\rho}
 - \frac {\frac{\partial h}{\partial \rho}} 
  {\frac{\partial p}{\partial \rho}}
@@ -844,9 +867,10 @@ We will still need gradients wrt $Y_k$.  This is best done using
 }
 
 \section{Kinetics}
-
+\label{sec:kinetics}
 Chemical potential is given by
 \[
+\label{eq:NIpotential}
 \mu_k = \left( \frac{\partial f}{\partial Y_k}\right)_{\tau,T,Y_j}
 \]
 
@@ -970,6 +994,7 @@ k_j^s =  k_j^f
 
 For the species transport, we write the chemical potential as
 \begin{eqnarray}
+\label{eq:muk_sm}
 \mu_k &=& \mu_k^{u,id} + \frac{R}{W_k} ln(X_k)  +  \mu_k^{sm} \\
  &=& h_k - T s_k^* + \frac{R T}{W_k} ln(p/p_0) + \frac{R}{W_k} ln(X_k) + \mu_k^{sm}
 \end{eqnarray}
@@ -992,6 +1017,7 @@ As before we note the
 \]
 and we define
 \[
+\label{eq:transp_gradp_multiplier}
 \phi = \rho \mathcal{Y} \theta
 \]
 We then define the thermodynamic driving force
@@ -1015,6 +1041,7 @@ For ideal gas, $\mathcal{D}$ is generated from binary diffusion coefficients, $D
 Maxwell Stefan relationships.
 For dense gases, from kinetic theory of dense gases we modify the binary diffusion coefficent to
 \[
+\label{eq:Dij}
 D_{ij} = \frac{n^{st}}{n \Upsilon_{ij}} D_{ij}^{st}
 \]
 where $n$ is total particle density and $\Upsilon_{ij}$ is a function of collision diameters.
@@ -1062,7 +1089,10 @@ For polyatomic they suggest
 
 Need to look for mixture formulae.  Suggest we consider some of the formulae in Poling book that Shashank
 recommended.
-\section{Things to compute}
+
+    \section{Implementation}
+    \subsection{API}
+    \label{sec:api}
 Need software to be able to compute the following things; the below is a template for what needs to be implemented. 
 
 Derivatves of attractive parameters:
@@ -1082,9 +1112,11 @@ b_m(Y_i,b_i) \qquad a_m(Y_i,a_i)
 
 Evaluation of energies for individual species:
 \[
+\label{eq:hk}
 h_k(Y, T, \rho) = h_k^{id}(T) + h_k^{dep}(Y,T,\rho)
 \]
 \[
+\label{eq:ek}
 e_k(Y, T, \rho) = e_k^{id}(T) + e_k^{dep}(Y,T,\rho)
 \]
 
@@ -1123,9 +1155,11 @@ Chemical potentials:
 \]
 
 Perturbations (multiplicative) to reaction rates (JBB developing):
-\[
+\begin{equation}
+\label{eq:rxn_corr}
 R_k(T,Y,\rho) = R_k^{id}(T,Y_k,\rho)\gamma_k^{dep}(T,Y,\rho)
-\]
+\end{equation}
+
 \MarginPar{JBB to do some deep thoughts here\ldots}
 
 Transport changes --- compute new driving force:
@@ -1149,7 +1183,7 @@ d
     \item Giovangigli has published trans-critical $H_2$-$O_2$ flame that we could use for validation 
     \
 \end{itemize}
-    \section{Implementation}
+
     \subsection {P-R EOS vs NIST}
     \label{sec:ComparePRvsNIST}
     In the following section, comparison between various thermodynamics computed using Peng-Robinson (PR) EOS and NIST data, computed using much more advanced MWR EOS, are presented. 
