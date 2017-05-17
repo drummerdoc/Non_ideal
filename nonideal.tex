@@ -976,11 +976,57 @@ r_j = k_j^s \left [ exp(\nu_{ij}^f \hat{\mu}_i) - exp ( \nu_{ij}^b \hat{\mu}_i) 
 \]
 where $k_j^s$ is the symmetric reaction rate.
 
-In the general discussion above, we introduced the notion of
-$\gamma_k$ which were the activity coefficients.
-When I look at the formulae those don't seem to add much.
-Instead we will try to capture the deviation between the pure component ideal gas chemical potential and
-the real chemical potential.
+\jbb{New Stuff}
+
+Here we express the rates in terms of a variant of activity coefficients, $\gamma_k$ defined above.
+This is more synoptic, see below for style of reasoning
+
+Write recaled ideal potential  $\hat{\mu}_k^{id}$ as
+The most natural was is to write it as
+\begin{equation}
+\hat{\mu}_k^{id} = \frac{W_k}{R T} (h_k - T s_k^* )+ ln(RT/p_0) + ln([X_k])
+\end{equation}
+where $[X_k]$ is the molar concentration.
+This leads to an alternative form of the pure component ideal chemical potential
+\begin{equation}
+\hat{\mu}_k^{id,u} = \frac{W_k}{R T} (h_k - T s_k^* )+ ln(RT/p_0) 
+\label{eq:chem_uid_conc}
+\end{equation}
+
+Now define
+\begin{equation}
+\gamma_k = exp[\hat{\mu}_k - \hat{\mu}_k^{u,id}]
+\label{eq:deviate_ideal}
+\end{equation}
+This is same as $\gamma_k$ above up to a possible scaling . . . need to check that.
+With this definition, in the ideal gas limit, $\gamma_k = 1$.
+
+With this setup we write the reactions in the more traditional way
+\begin{equation}
+\mathcal{r}_j = k_j^f \prod_k ([X_k]\gamma_k)^{\nu_{jk}^f}
+- k_j^b \prod_k ([X_k] \gamma_k)^{\nu_{jk}^b}
+\end{equation}
+In this form the forward and reverse rates are related
+\begin{equation}
+ k_j^f = k_j^b K_{eq}
+\end{equation}
+where
+\begin{equation}
+K_j^{EQ} = 
+exp( (\nu_{jk}^f - \nu_{jk}^b) \hat{\mu}_k^{id,u})
+\label{eq:kin_equil_trad}
+\end{equation}
+We can use $k_j^f$ in traditional Arrehnius form with this definition of equilibrium and all is thermodynamically
+consistent.  Can also try working in symmteric form with
+\[
+k_j^s =  k_j^f 
+\left ( \frac{p_0}{R T}  \right )^{\sum \nu_{jk}^f }exp( -\nu_{jk}^f \hat{\mu}_k^{u,id})
+\]
+
+\jbb{old Stuff}
+
+In this version we capture the deviation between the pure component ideal gas chemical potential and
+the real chemical potential, which is called the chemical activity
 
 There are a couple of ways to write $\mu_k^{id}$.
 The most natural was is to write it as
