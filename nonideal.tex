@@ -40,6 +40,7 @@
 \hrule\smallskip{\color{red}#1}\par\smallskip\hrule}}
 
 \newcommand{\jbb}[1]{{\bf[{\color{red}{JBB:  #1}}]}}
+\newcommand{\msd}[1]{{\bf[{\color{green}{MSD:  #1}}]}}
 
 
 
@@ -93,7 +94,8 @@ April 19, 2017
 \begin{description}
     \item[JBB] Write out reaction rate formalism in form of \ref{eq:rxn_corr} and fix that equation
     \item[RWG] Check on Hari's availablity to work on Fuego / rxn rate corrections
-    \item[MSD] Check if we actually need $c_v$ anywhere in PeleC
+    \item[MSD] Check if we actually need $c_v$ anywhere in PeleC \\
+      \msd{$c_v$ is required in (at least) two places: to compute the explicit timestep limit due to temperature diffusion, and to compute $T$ from $(e,Y)$.  The latter is done in the FUEGO-generated code, and uses a call to {\tt CKCVBS}}
     \item[SY] Generate plots of bulk and shear viscosity vs. T at multiple P (or vs. P at fixed T) from NIST database 
     \item[SY] Contact EM to discuss what has been done w.r.t. reading in $T_c$, $P_c$ for species and interfacing with LJ potentials to estimate those not available
     \item[HS] Set up branch for Fuego mods
