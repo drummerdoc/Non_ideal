@@ -10,7 +10,6 @@
 %\usepackage[showframe,%Uncomment any one of the following lines to test
 %%scale=0.7, marginratio={1:1, 2:3}, ignoreall,% default settings
 %%text={7in,10in},centering,
-%%margin=1.5in,
 %%total={6.5in,8.75in}, top=1.2in, left=0.9in, includefoot,
 %%height=10in,a5paper,hmargin={3cm,0.8in},
 %]{geometry}
@@ -41,7 +40,8 @@
 
 \newcommand{\jbb}[1]{{\bf[{\color{red}{JBB:  #1}}]}}
 \newcommand{\msd}[1]{{\bf[{\color{green}{MSD:  #1}}]}}
-
+\definecolor{drkgrn}{rgb}{0.043,0.341,0.2274}
+\newcommand{\rwg}[1]{{\bf[{\color{drkgrn}{RWG:  #1}}]}}
 
 
 \newcommand{\HeatFlux}{\boldsymbol{\mathcal{Q}}}
@@ -92,13 +92,17 @@ April 19, 2017
 \section{Approach}
 \subsection{Action Items}
 \begin{description}
-    \item[JBB] Write out reaction rate formalism in form of \ref{eq:rxn_corr} and fix that equation
-    \item[RWG] Check on Hari's availablity to work on Fuego / rxn rate corrections
-    \item[MSD] Check if we actually need $c_v$ anywhere in PeleC \\
+    \item[JBB] \sout{Write out reaction rate formalism in form of \ref{eq:rxn_corr} and fix that equation}\\
+        \rwg{This seems to be done for now.}
+    \item[RWG] \sout{Check on Hari's availablity to work on Fuego / rxn rate corrections}\\
+    \rwg{Hari's starting to adjust Fuego based on JBB's writeup, noting that things may yet evolve.}
+    \item[MSD] \sout{Check if we actually need $c_v$ anywhere in PeleC} \\
       \msd{$c_v$ is required in (at least) two places: to compute the explicit timestep limit due to temperature diffusion, and to compute $T$ from $(e,Y)$.  The latter is done in the FUEGO-generated code, and uses a call to {\tt CKCVBS}}
-    \item[SY] Generate plots of bulk and shear viscosity vs. T at multiple P (or vs. P at fixed T) from NIST database 
+    \item[SY] \sout{Generate plots of bulk and shear viscosity vs. T at multiple P (or vs. P at fixed T) from NIST database }\\
+        \rwg{SY showed me these plots - upshot we seem to be fine for CH4-air and H2-air, for heavier fuels may need to revisit. If anyone would like to see them in this doc or elsewhere say so\ldots}
     \item[SY] Contact EM to discuss what has been done w.r.t. reading in $T_c$, $P_c$ for species and interfacing with LJ potentials to estimate those not available
-    \item[HS] Set up branch for Fuego mods
+    \item[HS] \sout{Set up branch for Fuego mods} \\
+        \rwg{MSD did this: branch of {\it PelePhysics} is {\it fuego-work}}
     \item[SY] Implement the functionality in Section \ref{sec:api} pertaining to state thermodynamics; please update document with routine name for each when done
     \item[MSD] Provide feedback on implementation as it proceeds (also w.r.t. eventual use in PeleLM)
     \item[RG] Also provide feedback in implementation as it proceeds
@@ -169,7 +173,6 @@ Perturbations (multiplicative) to reaction rates (JBB developing):
 \[
 R_k(T,Y,\rho) = R_k^{id}(T,Y_k,\rho)\gamma_k^{dep}(T,Y,\rho)
 \]
-\MarginPar{JBB to do some deep thoughts here\ldots}
 
 Transport changes --- compute new driving force:
 \[
@@ -631,7 +634,6 @@ s_m &=& s_m^{id} -
 \end{eqnarray}
 
 In terms of the volume integral:
-\MarginPar{I think there is a typo here}
 \begin{equation}
 \frac{s^{ig}-s}{R} = \frac{e^{ig}-e}{RT}  -  \frac{f^{ig}-f}{RT}
 \end{equation}
@@ -640,7 +642,6 @@ where $f$ is the Helmholtz energy given by:
 \begin{equation}
 \frac{f^{ig}-f}{RT} = \int_{\tau}^{\infty} \left[1-Z\right]\frac{d\tau}{\tau} + ln Z
 \end{equation}
-\MarginPar{notation. $A\rightarrow f$}
 
 
 \paragraph{Chemical Potential}
@@ -1269,7 +1270,7 @@ c_p
 \]
 \[
 c_v \quad 
-\]\MarginPar{check if we really need $c_v$}
+\]
 Routines to compute T given the state and either internal energy or enthalpy via a solve using either Newton or Secant method (start with Secant):
 \[
 T(e_m,Y,\rho), \quad T(h_m,Y,\rho)
@@ -1295,8 +1296,6 @@ Perturbations (multiplicative) to reaction rates (JBB developing):
 \label{eq:rxn_corr}
 R_k(T,Y,\rho) = R_k^{id}(T,Y_k,\rho)\gamma_k^{dep}(T,Y,\rho)
 \end{equation}
-
-\MarginPar{JBB to do some deep thoughts here\ldots}
 
 Transport changes --- compute new driving force:
 \[
