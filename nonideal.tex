@@ -968,17 +968,17 @@ For kinetics you work with rescaled chemical potentials
 \]
 Molar production rates are given by
 \[
-\Omega_k = \sum_j (\nu_{ij}^b - \nu_{ij}^f) r_j
+\Omega_i = \sum_j (\nu_{ij}^b - \nu_{ij}^f) \mathcal{R}_j
 \]
 where 
 \[
-r_j = k_j^s \left [ exp(\nu_{ij}^f \hat{\mu}_i) - exp ( \nu_{ij}^b \hat{\mu}_i) \right ] 
+\mathcal{R}_j = k_j^s \left [ exp(\sum_k \nu_{jk}^f \hat{\mu}_k) - exp (\sum_k  \nu_{jk}^b \hat{\mu}_k) \right ] 
 \]
 where $k_j^s$ is the symmetric reaction rate.
 
 \jbb{New Stuff}
 
-Here we express the rates in terms of a variant of activity coefficients, $\gamma_k$ defined above.
+Here we express the rates in terms of a variant of activities, $a_k$ defined below.
 This is more synoptic, see below for style of reasoning
 
 Write recaled ideal potential  $\hat{\mu}_k^{id}$ as
@@ -995,32 +995,41 @@ This leads to an alternative form of the pure component ideal chemical potential
 
 Now define
 \begin{equation}
-\gamma_k = exp[\hat{\mu}_k - \hat{\mu}_k^{u,id}]
+a_k = exp[\hat{\mu}_k - \hat{\mu}_k^{u,id}]
 \label{eq:deviate_ideal}
 \end{equation}
-This is same as $\gamma_k$ above up to a possible scaling . . . need to check that.
-With this definition, in the ideal gas limit, $\gamma_k = 1$.
+The $a_k$ are called the chemical activities.
+In the ideal gas limit these become the molar concentrations $[X_k]$.
+%This is same as $\gamma_k$ above up to a possible scaling . . . need to check that.
+%With this definition, in the ideal gas limit, $\gamma_k = 1$.
 
 With this setup we write the reactions in the more traditional way
 \begin{equation}
-\mathcal{r}_j = k_j^f \prod_k ([X_k]\gamma_k)^{\nu_{jk}^f}
-- k_j^b \prod_k ([X_k] \gamma_k)^{\nu_{jk}^b}
+\mathcal{R}_j = k_j^f \prod_k (a_k)^{\nu_{jk}^f}
+- k_j^b \prod_k (a_k)^{\nu_{jk}^b}
 \end{equation}
 In this form the forward and reverse rates are related
 \begin{equation}
- k_j^f = k_j^b K_{eq}
+ k_j^f = k_j^b K_j^{eq}
 \end{equation}
 where
 \begin{equation}
-K_j^{EQ} = 
+K_j^{eq} = 
 exp( (\nu_{jk}^f - \nu_{jk}^b) \hat{\mu}_k^{id,u})
 \label{eq:kin_equil_trad}
 \end{equation}
+This is what's in chemkin but that break it into two pieces.
+
 We can use $k_j^f$ in traditional Arrehnius form with this definition of equilibrium and all is thermodynamically
 consistent.  Can also try working in symmteric form with
 \[
-k_j^s =  k_j^f 
-\left ( \frac{p_0}{R T}  \right )^{\sum \nu_{jk}^f }exp( -\nu_{jk}^f \hat{\mu}_k^{u,id})
+k_j^s
+=  k_j^f 
+%\left ( \frac{p_0}{R T}  \right )^{\sum \nu_{jk}^f }exp( -\nu_{jk}^f \hat{\mu}_k^{u,id})
+exp( - \sum_k \nu_{jk}^f \hat{\mu}_k^{u,id})
+=  k_j^b 
+%\left ( \frac{p_0}{R T}  \right )^{\sum \nu_{jk}^f }exp( -\nu_{jk}^f \hat{\mu}_k^{u,id})
+exp( -  \sum_k \nu_{jk}^b \hat{\mu}_k^{u,id})
 \]
 
 \jbb{old Stuff}
