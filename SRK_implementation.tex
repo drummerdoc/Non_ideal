@@ -1,0 +1,593 @@
+\documentclass[11pt]{article}
+
+\usepackage{graphicx}% Include figure files
+\usepackage{dcolumn}% Align table columns on decimal point
+\usepackage{bm}% bold math
+%\usepackage{hyperref}% add hypertext capabilities
+%\usepackage[mathlines]{lineno}% Enable numbering of text and display math
+%\linenumbers\relax % Commence numbering lines
+
+%\usepackage[showframe,%Uncomment any one of the following lines to test
+%%scale=0.7, marginratio={1:1, 2:3}, ignoreall,% default settings
+%%text={7in,10in},centering,
+%%total={6.5in,8.75in}, top=1.2in, left=0.9in, includefoot,
+%%height=10in,a5paper,hmargin={3cm,0.8in},
+%]{geometry}
+
+\usepackage{longtable}
+\usepackage{lipsum}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{hyperref}
+\usepackage{ulem}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+}
+
+\newcommand{\comment}[1]{}
+
+\setlength{\marginparwidth}{0.75in}
+\newcommand{\MarginPar}[1]{\marginpar{%
+\vskip-\baselineskip %raise the marginpar a bit
+\raggedright\tiny\sffamily
+\hrule\smallskip{\color{red}#1}\par\smallskip\hrule}}
+
+\newcommand{\jbb}[1]{{\bf[{\color{red}{JBB:  #1}}]}}
+\newcommand{\msd}[1]{{\bf[{\color{green}{MSD:  #1}}]}}
+\definecolor{drkgrn}{rgb}{0.043,0.341,0.2274}
+\newcommand{\rwg}[1]{{\bf[{\color{drkgrn}{RWG:  #1}}]}}
+
+
+\newcommand{\HeatFlux}{\boldsymbol{\mathcal{Q}}}
+\newcommand{\SpeciesFlux}{\boldsymbol{\mathcal{F}}}
+\newcommand{\SpeciesFluxB}{\bar{\boldsymbol{\mathcal{F}}}}
+\newcommand{\StressTensor}{\boldsymbol{\Pi}}
+\newcommand{\ShearViscosity}{\eta}
+\newcommand{\BulkViscosity}{\kappa}
+\newcommand{\ThermalConductivity}{\lambda}
+\newcommand{\EntropyProduction}{\mathfrak{v}}
+\newcommand{\OnsagerMatrix}{\boldsymbol{\mathfrak{L}}}
+\newcommand{\OnsagerMatrixB}{\bar{\boldsymbol{\mathfrak{L}}}}
+\newcommand{\OnesVector}{\mathbf{u}}
+\newcommand{\ChemicalSpeciesLabel}{\mathfrak{M}}
+\newcommand{\StochioPM}{\nu}
+
+\newcommand{\mbar}{\overline{m}}
+\newcommand{\wbar}{\overline{W}}
+\newcommand{\Jbar}{\bar{\mathbf{J}}}
+\newcommand{\Xbar}{\bar{\mathbf{X}}}
+\newcommand{\Lbar}{\bar{\mathbf{L}}}
+\newcommand{\Bbar}{\bar{\mathbf{B}}}
+\newcommand{\Wbar}{\bar{\mathcal{Z}}}
+\newcommand{\Wcbar}{\bar{\mathcal{W}}}
+\newcommand{\Bcbar}{\bar{\mathcal{B}}}
+\newcommand{\lbar}{\bar{\mathbf{l}}}
+\newcommand{\xibar}{\bar{\xi}}
+\newcommand{\DonevDiffusion}{{D}}
+\newcommand{\half}{\frac{1}{2}}
+
+\begin{document}
+\begin{center}
+{\bf
+SRK Implementation
+}
+
+\vspace{\baselineskip}
+John B. Bell \\
+Alejandro Garcia \\
+Ray Grout \\
+Emmanuel Motheau \\
+Andrew Nonaka \\
+Shashank Yellapantula
+
+\vspace{\baselineskip}
+April 19, 2017
+\end{center}
+
+\section{Things to compute}
+Need software to be able to compute the following things; the below is a template for what needs to be implemented. 
+
+Derivatves of attractive parameters:
+\[
+\frac{\partial a_m}{\partial Y_k} \quad \frac{\partial a_m}{\partial T} \quad \frac{\partial b_m}{\partial Y_k} \quad \frac{\partial^2 a_m}{\partial T^2}
+\]
+
+Derivatives of state variables
+\[
+\quad \frac{\partial p}{\partial \tau}, \quad \frac{\partial p}{\partial T}
+\]
+
+Mixing rules:
+\[
+b_m(Y_i,b_i) \qquad a_m(Y_i,a_i)
+\]
+
+Evaluation of energies for individual species:
+\[
+h_k(Y, T, \rho) = h_k^{id}(T) + h_k^{dep}(Y,T,\rho)
+\]
+\[
+e_k(Y, T, \rho) = e_k^{id}(T) + e_k^{dep}(Y,T,\rho)
+\]
+
+Mixture energies:
+\[
+e_m(Y, T, \rho) = \left[e_m^{id} = \sum_k Y_Ke_k^{id}\right] + e_m^{dep}(Y,T,\rho)
+\]
+\[
+h_m(Y, T, \rho) = \left[h_m^{id} = \sum_k Y_Kh_k^{id}\right] + h_m^{dep}(Y,T,\rho)
+\]
+Specific heats
+\[
+c_p 
+\]
+\[
+c_v
+\]
+Routines to compute T given the state and either internal energy or enthalpy via a solve using either Newton or Secant method (start with Secant):
+\[
+T(e_m,Y,\rho), \quad T(h_m,Y,\rho)
+\]
+
+Sound speed:
+\[
+a
+\]
+
+Pressure:
+\[
+p = p^{id}(\rho, Y, T) + \Phi,  \qquad \Phi(\rho, Y, T)
+\]
+
+Chemical potentials:
+\[
+\mu_k = \left(\frac{\partial f}{\partial Y_k}\right)_{\tau,T,Y}
+\]
+
+Chemical acitivities $A_k$ for use in reactions
+
+Transport changes --- compute new driving force: 
+\MarginPar{Need to check this}
+\[
+\left(\frac{\partial \tau}{\partial Y}\right)_{T,p}
+\]
+Use derivatives to compute $\theta$ and hence $\phi$.
+
+\section{Giovangigli approach to deriving formulae}
+
+What we would like to do is start with an equation of state and derive other quantities we need that
+are thermodynamically consistent.  The EOS doesn't nail things down completely.  A way to get around that
+(which is done by Giovangigli in his nonideal papers) is to
+say
+\[
+p = p^{id} + \Phi
+\]
+where $p^{id}$ is the ideal gas part and assume that as density goes to zero, the EOS becomes
+ideal.  In other words we look at deviation form ideal.
+What Giovangigli does is to write thermodynamic quantities as
+\[
+\Psi = \Psi^{id} - \int_\tau^\infty \frac{\partial \Psi}{\partial \tau} d \tau
+\]
+
+For internal energy from the Helmholtz equation
+\begin{equation}
+\frac{\partial e}{\partial \tau} = T^2 \frac{\partial (\Phi/T)} {\partial T}
+\end{equation}
+If we use the above and note that $p^{id}/T$ is independent of $T$ then
+\begin{equation}
+e = e^{id}- \int_\tau^\infty  T^2 \frac{\partial (\Phi/T)} {\partial T} d\tau
+\label{eq:energy_gen}
+\end{equation}
+
+For entropy of mixture, $s_m$,
+\begin{equation}
+s_m = s_m^{id} -
+-\int_\tau^{\infty} \frac{\partial (\Phi)} {\partial T} d\tau ' 
+\end{equation}
+
+
+From free energy we also have
+\[
+\mu_k = \frac{\partial f}{\partial Y_k} = 
+ \frac{\partial e_m}{\partial Y_k} - 
+ T\frac{\partial s_m}{\partial Y_k} 
+\]
+so that
+\begin{equation}
+\mu_k =
+ \mu_k^{id} + \int_\tau^\infty \frac{\partial (\Phi)} {\partial Y_k} d\tau
+\end{equation}
+
+Enthalpy of the mixture is given by $h_m = e_m + P \tau$.  Partial enthalpies are
+\[
+h_k = \left. \frac{\partial h}{\partial Y_k} \right|_{T,p,Y_{k\ne l}}
+\]
+The natural form given by the Giovangigli approach gives things as a function of $\rho$, $T$ and $Y_k$.
+This can be address using
+\begin{equation}
+\frac{\partial h}{\partial (T,Y,p)}
+= \frac{\partial h}{\partial (T,Y,\rho)}
+\frac{\partial (T,Y,\rho)}{\partial (T,Y,p)}
+= \frac{\partial h}{\partial (T,Y,\rho)}
+\left (\frac{\partial (T,Y,p)}{\partial (T,Y,\rho)} \right)^{-1}
+\label{eq:calc_cov}
+\end{equation}
+
+\section{Specialization for SRK}
+\label{sec:eos}
+
+
+\[
+p = p^{id} + \Phi
+\]
+
+\[
+p^{id} = R T \sum \frac{Y_k}{W_k} \frac{1}{\tau}
+\]
+\[
+\label{eq:pSRK}
+p = R T \sum \frac{Y_k}{W_k} \frac{1}{\tau - b_m} - \frac{a_m}{\tau(\tau + b_m)}
+\]
+\[
+\Phi
+= R T \sum \frac{Y_k}{W_k} \frac{b_m}{\tau(\tau -b_m)} - \frac{a_m}{\tau (\tau + b_m}
+\]
+Mixing rules $a_m = a_m(T, Y_k)$ and $b_m = b_m(Y_k)$
+with mixing rules
+\[
+a_m = \sum_{ij} Y_i Y_j \alpha_i \alpha_j \;\;\;  b_m = \sum_k Y_k b_k
+\]
+Note that the $a_j$ and $b_i$ are scaled by molecular weights relative to what is often used
+in the thermodynamics literature.
+\MarginPar{need to fix these}
+Typically, $a_i$ and $b_i$ are defined using the critical quantities and temperature dependent correction factors~\cite{poling2001properties}:
+\begin{align}
+\alpha_i & = \sqrt{a_i} \nonumber \\
+a_i(T) &= a_i^{*}\left(T_{c,i},P_{c,i}\right) \bar{a}_i (T/T_{c,i})  \nonumber \\
+       &= 0.42748 \frac{\left(R T_{c,i} \right)^2}{W_i^2 p_{c,i}} \bar{a}_i \left(T/T_{c,i}\right)  \nonumber \\
+ b_i &= 0.08664 \frac{R T_{c,i}}{W_i p_{c,i}}   
+       \label{eq:abformEOS}
+\end{align}
+where
+\[
+\bar{a}_i (T/T_{c,i}) = \left(1 + \mathcal{A} \left[ f\left( \omega_i \right) \left(1-\sqrt{T/T_{c,i}} \right ) \right] \right)^2
+\]
+%\jbb{One would like to use a mollified version of the $\alpha$ to smooth behavior near critical point}
+where $\omega_i$ are the acentric terms.
+Here $\mathcal{A}$ is a smoothing function to make derivatives smmoth at $T_{c,i}$
+\[
+f\left( \omega_i \right) = 0.48508 + 1.5517 \omega_i - 0.151613 \omega_{i}^2
+\]
+
+\[
+e_m = \sum_k Y_k e_k^{id} + \left( T  \frac{\partial a_m}{\partial T}  - a_m \right)
+\frac{1}{b_m} ln ( 1 + \frac{b_m}{\tau})
+\]
+To define the entropy 
+\begin{equation}
+s_m = \sum_k Y_k s_k^{id} - 
+ \sum_k \frac{Y_k R}{W_k} ln \left(\frac{\tau}{\tau-b_m} \right)
++ \frac{\partial a_m}{\partial T} \frac{1}{b_m} ln ( 1 + \frac{b_m}{\tau})
+\end{equation}
+In this form, 
+\[
+s_k^{id} = s_k^{id,*} - \frac{R}{W_k} ln(\frac{Y_k}{W_k \tau  p^{st}})
+\]
+where
+\[
+s_k^{id,*} = s_k^{st} + \int_{T^{st}}^T  c_p(T')/T' dT'
+\]
+where $p^{st}$ is the standard reference pressure
+So when you put this together you get
+\[
+s_m = \sum_k Y_k s_k^{id,*} - \sum_k \frac{Y_k R}{W_k} ln  \left( \frac{Y_k R T}{W_k (\tau -b_m) p^{st}}   \right )
++ \frac{\partial a_m}{\partial T} \frac{1}{b_m} ln ( 1 + \frac{b_m}{\tau})
+\]
+From definition of enthalpy,
+\[
+\label{eq:hmSRK}
+h_m = \sum_k Y_k h_k^{id} + \left ( T \frac{\partial a_m}{\partial T} - a_m \right)
+\frac{1}{b_m} ln ( 1 + \frac{b_m}{\tau})
++ 
+R T \sum \frac{Y_k}{W_k} \frac{b_m}{\tau -b_m} - \frac{a_m}{\tau + b_m}
+\]
+
+Start with specific heats
+\[
+c_v = \left( \frac{\partial e_m}{\partial T}\right)_{\tau,Y}
+\]
+which becomes
+\[
+c_v = c_v^{id} + T \frac{\partial^2 a_m}{\partial T^2} \frac{1}{b_m} ln ( 1 + \frac{b_m}{\tau})
+\]
+\[
+c_p =  \frac{\partial h_m}{\partial T}
+- \frac {\frac{\partial h}{\partial \tau}} 
+ {\frac{\partial p}{\partial \tau}}
+\frac{\partial p}{\partial T}
+\]
+where derivatives are with respect $\rho, T, Y_k$ independent variables
+\[
+\frac{\partial p}{\partial T} = \sum Y_k / W_k  \frac{R}{\tau-b_m} - \frac{\partial a_m}{\partial T} \frac{1}{\tau(\tau +b_m)}
+\]
+\[
+\frac{\partial p}{\partial \tau} =
+\sum Y_k / W_k  \frac{R T}{(\tau-b_m)^2} + \frac{a_m (2 \tau + b_m)}{[\tau(\tau +b_m)]^2}
+\]
+
+\vspace{\baselineskip}
+\[
+\frac{\partial h_m}{\partial \tau} =
+-(T \frac{\partial a_m}{\partial T}  - a_m )
+\frac{1}{\tau(\tau+b_m)}
++ \frac{a_m}{(\tau+b_m)^2}
+-\sum Y_k / W_k  \frac{R T b_m}{(\tau-b_m)^2} 
+\]
+\vspace{\baselineskip}
+\[
+\frac{\partial h_m}{\partial T} = c_p^{id}
++T \frac{\partial^2 a_m}{\partial T^2} 
+\frac{1}{b_m} ln ( 1 + \frac{b_m}{\tau})
+- \frac{\partial a_m}{\partial T} 
+\frac{1}{\tau+b_m}
++\sum Y_k / W_k  \frac{R b_m}{\tau-b_m} 
+\]
+Sound speed
+\[
+a^2 = -\frac{c_p}{c_v} \tau^2  \frac{\partial p}{\partial \tau}
+\]
+
+\[
+h_k = \frac{\partial h_m}{\partial Y_k }
+- \frac {\frac{\partial h}{\partial \tau}} 
+ {\frac{\partial p}{\partial \tau}}
+ \frac{\partial p}{\partial Y_k}
+\]
+\begin{align}
+\frac{\partial h_m}{\partial Y_k } &=  h_k^{id}
++ (T \frac{\partial^2 a_m}{\partial T \partial Y_k}  - \frac{\partial a_m }{Y_k})
+\frac{1}{b_m} ln(1+ \frac{b_m}{\tau})
+-(T \frac{\partial a_m}{\partial T}  - a_m ) \left[ \frac{1}{b_m^2} ln(1+ \frac{b_m}{\tau})
++ \frac{1}{b_m(\tau+b_m)}
+\right ] \frac{\partial b_m}{\partial Y_k} \nonumber \\
+&+ \frac{a_m}{(\tau+b_m)^2}  \frac{\partial b_m}{\partial Y_k}
+- \frac{1}{\tau+b_m}  \frac{\partial a_m}{\partial Y_k}
++ 1 / W_k  \frac{R T b_m}{\tau-b_m}+
+\sum_i \frac{Y_i}{W_i} R T ( \frac{1}{\tau -b_m} + \frac{b_m}{(\tau-b_m)^2} ) \frac{ \partial b_m}{\partial Y_k} 
+\end{align}
+\[
+ \frac{\partial p}{\partial Y_k}
+= 
+ R T \frac{1}{W_k} \frac{1}{\tau - b_m} - \frac{\partial a_m}{\partial Y_k} \frac{1}{\tau(\tau + b_m)}
++\left(R T \sum \frac{Y_k}{W_k} \frac{1}{(\tau - b_m)^2} - \frac{a_m}{\tau(\tau + b_m)^2} \right ) \frac{\partial b_m}{\partial Y_k}
+\]
+
+For kinetics and transport need chemical potential. For that free energy is given by
+\begin{align}
+f &= \sum_i Y_i (e_i^{id} - T s_i^{id,*}) +  \sum_i \frac{Y_i R T}{W_i} ln (\frac{Y_i R T}{W_i \tau p^{st}})  \nonumber \\
+&+ \sum_i \frac{Y_i R T}{W_i} ln (\frac{\tau}{\tau-b_m}) - \frac{\partial a_m}{\partial T} \frac{1}{b_m}
+ln (1+ \frac{b_m}{\tau})  \nonumber \\
+ &= \sum_i Y_i (e_i^{id} - T s_i^{id,*}) +  \sum_i \frac{Y_i R T}{W_i} ln (\frac{Y_i R T}{W_i (\tau-b_m) p^{st}} )
+- \frac{\partial a_m}{\partial T} \frac{1}{b_m}
+ln (1+ \frac{b_m}{\tau})  \nonumber 
+\end{align}
+Then
+\begin{align}
+\mu_k &= \frac{\partial f}{\partial Y_k} = 
+e_k^{id} - T s_k^{id,*}  + \frac{RT}{W_k} ln (\frac{Y_k R T}{W_k (\tau-b_m) p^{st}})
++ \frac{RT}{W_k} +  \frac{RT}{\wbar} \frac{1}{\tau-b_m} \frac {b_m}{Y_k} \nonumber \\
+&- \frac{1}{b_m} ln(1 + \frac{b_m}{\tau}) \frac{\partial a_m}{\partial Y_k}
++ \frac{a_m}{b_m^2} ln(1 + \frac{b_m}{\tau}) \frac{\partial b_m}{\partial Y_k}
+- \frac{a_m}{b_m} \frac{1}{\tau+b_m} \frac{\partial b_m}{\partial Y_k}
+\end{align}
+Letting
+\begin{align}
+\mu_k^{id,u} &=  e_k^{id} - T s_k^{id,*} + \frac{RT}{W_k}+ \frac{R T}{W_k} ln( \frac{RT}{p^{st}})
+ &=  h_k^{id} - T s_k^{id,*} + \frac{R T}{W_k} ln( \frac{RT}{p^{st}})
+\end{align}
+\begin{align}
+\mu_k &= \mu_k^{id,u} + \frac{RT}{\wbar} \frac{1}{\tau-b_m} \frac {b_m}{Y_k}
++ \frac {RT}{W_k} ln ( \frac{Y_k}{W_k (\tau-b_m)}) \nonumber \\
+&- \frac{1}{b_m} ln(1 + \frac{b_m}{\tau}) \frac{\partial a_m}{\partial Y_k}
++ \frac{a_m}{b_m^2} ln(1 + \frac{b_m}{\tau}) \frac{\partial b_m}{\partial Y_k}
+- \frac{a_m}{b_m} \frac{1}{\tau+b_m} \frac{\partial b_m}{\partial Y_k}
+\end{align}
+\begin{align}
+A_k &=  exp  (  \frac{W_k}{RT}   [
+\frac{RT}{\wbar} \frac{1}{\tau-b_m} \frac {b_m}{Y_k}
++ \frac {RT}{W_k} ln ( \frac{Y_k}{W_k (\tau-b_m)}) \nonumber \\
+&- \frac{1}{b_m} ln(1 + \frac{b_m}{\tau}) \frac{\partial a_m}{\partial Y_k}
++ \frac{a_m}{b_m^2} ln(1 + \frac{b_m}{\tau}) \frac{\partial b_m}{\partial Y_k}
+- \frac{a_m}{b_m} \frac{1}{\tau+b_m} \frac{\partial b_m}{\partial Y_k} ] )
+%\right ] \right )
+\end{align}
+
+
+\section{Kinetics}
+\label{sec:kinetics}
+Chemical potential is given by
+\[
+\label{eq:NIpotential}
+\mu_k = \left( \frac{\partial f}{\partial Y_k}\right)_{\tau,T,Y_j}
+\]
+
+For kinetics you work with rescaled chemical potentials
+\[
+\hat{\mu} = \frac{1}{k_B T} \mathcal{M} \mu \;\;\;  \mathrm{or, equivalently} \;\;\;  
+\hat{\mu}_k = \frac{W_k}{R T} \mu_k
+\]
+Molar production rates are given by
+\[
+\Omega_i = \sum_j (\nu_{ij}^b - \nu_{ij}^f) \mathcal{R}_j
+\]
+where 
+\[
+\mathcal{R}_j = k_j^s \left [ exp(\sum_k \nu_{jk}^f \hat{\mu}_k) - exp (\sum_k  \nu_{jk}^b \hat{\mu}_k) \right ] 
+\]
+where $k_j^s$ is the symmetric reaction rate.
+
+Here we express the rates in terms of a variant of activities, $a_k$ defined below.
+This is more synoptic, see below for style of reasoning
+
+Write recaled ideal potential  $\hat{\mu}_k^{id}$ as
+The most natural was is to write it as
+\begin{equation}
+\hat{\mu}_k^{id} = \frac{W_k}{R T} (h_k^{id} - T s_k^{id,*} )+ ln(RT/p_0) + ln([X_k])
+\end{equation}
+where $[X_k]$ is the molar concentration.
+This leads to an alternative form of the pure component ideal chemical potential
+\begin{equation}
+\hat{\mu}_k^{id,u} = \frac{W_k}{R T} (h_k^{id} - T s_k^{id,*} )+ ln(RT/p_0) 
+\label{eq:chem_uid_conc}
+\end{equation}
+
+Now define
+\begin{equation}
+A_k = exp[\hat{\mu}_k - \hat{\mu}_k^{u,id}]
+\label{eq:deviate_ideal}
+\end{equation}
+The $A_k$ are called the chemical activities.
+In the ideal gas limit these become the molar concentrations $[X_k]$.
+%This is same as $\gamma_k$ above up to a possible scaling . . . need to check that.
+%With this definition, in the ideal gas limit, $\gamma_k = 1$.
+
+With this setup we write the reactions in the more traditional way
+\begin{equation}
+\mathcal{R}_j = k_j^f \prod_k (A_k)^{\nu_{jk}^f}
+- k_j^b \prod_k (A_k)^{\nu_{jk}^b}
+\end{equation}
+In this form the forward and reverse rates are related
+\begin{equation}
+ k_j^f = k_j^b K_j^{eq}
+\end{equation}
+where
+\begin{equation}
+K_j^{eq} = 
+exp( (\nu_{jk}^f - \nu_{jk}^b) \hat{\mu}_k^{id,u})
+\label{eq:kin_equil_trad}
+\end{equation}
+This is what's in chemkin but that break it into two pieces.
+
+We can use $k_j^f$ in traditional Arrehnius form with this definition of equilibrium and all is thermodynamically
+consistent.  Can also try working in symmteric form with
+\[
+k_j^s
+=  k_j^f 
+%\left ( \frac{p_0}{R T}  \right )^{\sum \nu_{jk}^f }exp( -\nu_{jk}^f \hat{\mu}_k^{u,id})
+exp( - \sum_k \nu_{jk}^f \hat{\mu}_k^{u,id})
+=  k_j^b 
+%\left ( \frac{p_0}{R T}  \right )^{\sum \nu_{jk}^f }exp( -\nu_{jk}^f \hat{\mu}_k^{u,id})
+exp( -  \sum_k \nu_{jk}^b \hat{\mu}_k^{u,id})
+\]
+
+\section{Species transport}
+\MarginPar{need to fix this}
+
+For the species transport, we write the chemical potential as
+\begin{eqnarray}
+\label{eq:muk_sm}
+\mu_k &=& \mu_k^{u,id} + \frac{R}{W_k} ln(X_k)  +  \mu_k^{sm} \\
+ &=& h_k - T s_k^* + \frac{R T}{W_k} ln(p/p_0) + \frac{R}{W_k} ln(X_k) + \mu_k^{sm}
+\end{eqnarray}
+This is likely equivalent to using the $\gamma$ if we define them in the right way but I'm not sure
+introducing the $ln$ does us much good.
+At least according to Giovangigli, $\mu_k^{sm}$ is smooth as species vanish.  For SRk this appears to be true.
+
+In vector form we have (thinking of $\mu$ as a function of $T$, $p$ and $X$
+\begin{equation}
+\nabla_T \mu
+= R T \mathcal{W}^{-1} \mathcal{X}^{-1} \nabla X +
++ R T \mathcal{W}^{-1} \nabla_{T,p} \; \mu^{sm} +
++ \frac{\partial \mu}{\partial p}
+\end{equation}
+As before we note the
+\[
+\left(\frac{\partial \mu}{\partial p}\right)_{X,T} \equiv \theta = \left(\frac{ \partial \tau}{\partial Y}\right)_{T,p}
+ =
+\frac{-1}{\rho^2}\left (\frac{\partial \rho}{\partial Y} \right)_{T,p}
+\]
+and we define
+\[
+\label{eq:transp_gradp_multiplier}
+\phi = \rho \mathcal{Y} \theta
+\]
+We then define the thermodynamic driving force
+\[
+d = \nabla X  + \frac{\overline{W}}{R T} \mathcal{W} \mathcal{Y} \nabla_{T,p} \; \mu^{sm}  + \frac{\mbar}{\rho k_B T} (\phi - Y) \nabla p
+\]
+and
+\[
+\mathcal{F} = - \rho \mathcal{Y} \mathcal{D} ( d + \mathcal{X} \frac{ \tilde{\chi}}{T} \nabla T)
+\]
+and
+\[
+\HeatFlux = - \lambda \nabla T + k_B T {\tilde{\chi}}^T \mathcal{M}^{-1} \SpeciesFlux + h^T \SpeciesFlux
+\]
+
+\subsection{Transport coefficients}
+
+NOTE:  These need more work.
+
+For ideal gas, $\mathcal{D}$ is generated from binary diffusion coefficients, $D_{ij}$ using
+Maxwell Stefan relationships.
+For dense gases, from kinetic theory of dense gases we modify the binary diffusion coefficent to
+\[
+\label{eq:Dij}
+D_{ij} = \frac{n^{st}}{n \Upsilon_{ij}} D_{ij}^{st}
+\]
+where $n$ is total particle density and $\Upsilon_{ij}$ is a function of collision diameters.
+The $\Upsilon$ are given in \cite{KurochkinETAL:1984}.
+See Eq. (35) in \cite{giovangigli_CTM:2011}.
+
+Thermal conductivity can be given as
+\MarginPar{Need to figure out how to evaluate the things appearing here - and to determine if they matter - Shashank making plots from NIST to see if they do}
+\[
+\lambda = \lambda^{dil} \beta + \lambda^{hp}
+\]
+from Chung et al. \cite{chung:1988} and Ely and Hanley \cite{ElyHanley:1983}
+
+Giovangigli uses dilute thermal diffusion rations in 
+\cite{giovangigli_CTM:2011}.
+
+From BCH and Chapman and Cowling,
+for single component gases define
+\[
+\beta = \frac {2}{3} \pi n \sigma^3 \;\;\; \mathrm{and} \;\;\; \zeta = 1+\frac{5}{8} \beta
+\]
+where $\sigma$ is molecular diameter.
+Then for dense gases they define
+\[
+\eta = \eta_0 (\frac{1}{\zeta} + 0.8 \beta + 0.761 \beta^2 \zeta)
+\]
+where $\eta_0$ is the low pressure shear viscosity.
+
+They also set bulk viscosity as
+\[
+\kappa = 1.002 \eta_0 \beta^2 \zeta
+\]
+This has rather a hard sphere quality
+
+For a monatomic gas they also set
+\[
+\lambda = \lambda_0 (\frac{1}{\zeta} + 1.2 \beta + 0.755 \beta^2 \zeta)
+\]
+but this is not supposed to be good for polyatomic molecules.
+For polyatomic they suggest
+\[
+\lambda = \eta_0 \frac{R}{W \zeta} \left(\frac{c_v}{k_b} + \frac{9}{4} \right)
++ \frac{15 R}{4 w} \eta_0 \beta \left( 1.2 + 0.755 \beta \zeta \right ) 
+\]
+
+Need to look for mixture formulae.  Suggest we consider some of the formulae in Poling book that Shashank
+recommended.
+
+\bibliographystyle{unsrt}% Produces the bibliography via BibTeX.
+\bibliography{nonideal_refs}% Produces the bibliography via BibTeX.
+
+\end{document}
