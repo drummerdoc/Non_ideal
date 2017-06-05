@@ -408,6 +408,29 @@ A_k &=  exp  (  \frac{W_k}{RT}   [
 %\right ] \right )
 \end{align}
 
+Godunov routine also needs some derivatives to express source terms in terms of primitive
+variables.  
+In particular one needs
+\[
+\left . \frac{\partial p}{\partial \rho} \right|_{e,Y} =
+-\tau^2 \left( 
+\frac{\partial p}{\partial \tau}
+- \frac {\frac{\partial e}{\partial \tau}} 
+ {\frac{\partial e}{\partial T}}
+\frac{\partial p}{\partial T} \right )
+\]
+and
+\[
+\left . \frac{\partial p}{\partial e} \right|_{\rho,Y} = \frac{1}{c_v} 
+\frac{\partial p}{\partial T}
+\]
+We have everything we need here except for
+\[
+\frac{\partial e}{\partial \tau} = 
+\frac{1}{\tau ( \tau + b_m)}
+\left( a_m - T  \frac{\partial a_m}{\partial T}  \right)
+\]
+
 
 \section{Kinetics}
 \label{sec:kinetics}
