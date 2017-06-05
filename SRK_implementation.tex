@@ -381,7 +381,7 @@ Then
 \begin{align}
 \mu_k &= \frac{\partial f}{\partial Y_k} = 
 e_k^{id} - T s_k^{id,*}  + \frac{RT}{W_k} ln (\frac{Y_k R T}{W_k (\tau-b_m) p^{st}})
-+ \frac{RT}{W_k} +  \frac{RT}{\wbar} \frac{1}{\tau-b_m} \frac {b_m}{Y_k} \nonumber \\
++ \frac{RT}{W_k} +  \frac{RT}{\wbar} \frac{1}{\tau-b_m} \frac {\partial b_m}{\partial Y_k} \nonumber \\
 &- \frac{1}{b_m} ln(1 + \frac{b_m}{\tau}) \frac{\partial a_m}{\partial Y_k}
 + \frac{a_m}{b_m^2} ln(1 + \frac{b_m}{\tau}) \frac{\partial b_m}{\partial Y_k}
 - \frac{a_m}{b_m} \frac{1}{\tau+b_m} \frac{\partial b_m}{\partial Y_k}
@@ -392,7 +392,7 @@ Letting
  &=  h_k^{id} - T s_k^{id,*} + \frac{R T}{W_k} ln( \frac{RT}{p^{st}})
 \end{align}
 \begin{align}
-\mu_k &= \mu_k^{id,u} + \frac{RT}{\wbar} \frac{1}{\tau-b_m} \frac {b_m}{Y_k}
+\mu_k &= \mu_k^{id,u} + \frac{RT}{\wbar} \frac{1}{\tau-b_m} \frac {\partial b_m}{\partial Y_k}
 + \frac {RT}{W_k} ln ( \frac{Y_k}{W_k (\tau-b_m)}) \nonumber \\
 &- \frac{1}{b_m} ln(1 + \frac{b_m}{\tau}) \frac{\partial a_m}{\partial Y_k}
 + \frac{a_m}{b_m^2} ln(1 + \frac{b_m}{\tau}) \frac{\partial b_m}{\partial Y_k}
@@ -486,7 +486,75 @@ exp( - \sum_k \nu_{jk}^f \hat{\mu}_k^{u,id})
 exp( -  \sum_k \nu_{jk}^b \hat{\mu}_k^{u,id})
 \]
 
-\section{Species transport}
+\section{Species transport -- NEW}
+
+When $\mu$ (vector of chemical potential) is written as a funcion of $T,Y,p$ then
+from Onsager relations
+the diffusive driving force is given by
+\[
+d = \frac{\wbar}{RT} \mathcal{Y} \; \nabla_T \; \mu
+\]
+where the transport is given by
+\[
+\SpeciesFlux = - \rho \mathcal{Y} \mathcal{D} ( d + \mathcal{X} \frac{ \tilde{\chi}}{T} \nabla T )
+\]
+However, we are given $\mu$ as a function of $T,Y,\tau$ so we need to use change of variables formulae
+to write as
+\[
+\nabla_T \; \mu_k = 
+\frac{\frac{\partial \mu_k}{\partial \tau}}
+{\frac{\partial p}{\partial \tau}} \nabla p
++
+\left (
+\frac{\partial \mu_k}{\partial Y} -
+\frac{\frac{\partial \mu_k}{\partial \tau}}
+{\frac{\partial p}{\partial \tau}} 
+\frac{\partial p}{\partial Y} 
+\right ) \nabla Y
+\]
+Thus we need to compute
+\[
+\frac{\partial \mu_k}{\partial Y_j}
+\]
+and
+\[
+\frac{\partial \mu_k}{\partial \tau}
+\]
+First we have
+\begin{align}
+\frac{\partial \mu_k}{\partial Y_j} &=  \frac{RT}{W_k Y_k} \delta_{jk} + \frac{RT}{\tau-b_m} \left(
+\frac{1}{W_k} \frac{\partial b_m}{\partial Y_j}+\frac{1}{W_j} \frac{\partial b_m}{\partial Y_k} \right )
++ \frac{RT}{\wbar} \frac{1} {(\tau - b_m)^2} \frac{\partial b_m}{\partial Y_k} \frac{\partial b_m}{\partial Y_j}  \nonumber \\
+&- \frac{1}{b_m} ln ( 1 + \frac{b_m}{\tau} ) \frac{\partial^2 a_m }{\partial Y_k \partial Y_j}
++ \left ( \frac{1}{b_m^2} ln ( 1 + \frac{b_m}{\tau} ) - \frac{1}{b_m} \frac{1}{\tau+b_m}  \right)
+\frac{\partial a_m }{ \partial Y_j}
+\frac{\partial b_m }{\partial Y_k }
+\nonumber \\
+&+\left( \frac{1}{b_m^2} ln ( 1 + \frac{b_m}{\tau} ) \frac{\partial a_m}{\partial Y_k} - \frac{1}{b_m} \frac{1}{\tau+b_m} \right )
+\frac{\partial b_m }{\partial Y_k } \nonumber \\
+&+ \left( \frac{-2 a_m}{b_m^3} ln ( 1 + \frac{b_m}{\tau} ) + \frac{a_m}{b_m^2} \frac{1}{\tau+b_m} \right )
+\frac{\partial b_m }{\partial Y_j } \frac{\partial b_m }{\partial Y_k } \nonumber \\
+&+ \left( \frac{ a_m}{b_m^2} \frac{1}{\tau+b_m} + \frac{a_m}{b_m} \frac{1}{(\tau+b_m)^2} \right )
+\frac{\partial b_m }{\partial Y_j } \frac{\partial b_m }{\partial Y_k }
+\end{align}
+Note that the first term is ill-behaved as $Y_k \rightarrow 0$ but this is cancelled out by the multiplication by
+$\mathcal{Y}$ need to define the $d$.  This cancelation needs to be done analytically for things to work correctly.
+One would like to subtract (I think)
+\[
+\frac{\wbar Y} { (\rho R T)} \nabla p
+\]
+from $d$ to make them invariant.  
+We also need
+\begin{align}
+\frac{\partial \mu_k}{\partial \tau} &=  
+-\frac{RT}{\wbar (\tau-b_m)^2} \frac{\partial b_m}{\partial Y_k}
+-\frac{RT}{W_k (\tau-b_m)} \nonumber \\
+&+ \left( \frac{\partial a_m}{\partial Y_k} - \frac{a_m}{b_m} \frac{\partial b_m}{\partial Y_k} \right )
+\frac{1}{\tau ( \tau+b_m)}
++ \frac{a_m}{b_m} \frac{1}{(\tau - b_m)^2} \frac{\partial b_m}{\partial Y_k}
+\end{align}
+
+\section{Species transport -- OLD}
 \MarginPar{need to fix this}
 
 For the species transport, we write the chemical potential as
