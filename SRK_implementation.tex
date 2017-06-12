@@ -317,7 +317,7 @@ where derivatives are with respect $\rho, T, Y_k$ independent variables
 \frac{\partial p}{\partial T} = \sum Y_k / W_k  \frac{R}{\tau-b_m} - \frac{\partial a_m}{\partial T} \frac{1}{\tau(\tau +b_m)}
 \]
 \[
-\frac{\partial p}{\partial \tau} =
+\frac{\partial p}{\partial \tau} = -
 \sum Y_k / W_k  \frac{R T}{(\tau-b_m)^2} + \frac{a_m (2 \tau + b_m)}{[\tau(\tau +b_m)]^2}
 \]
 
@@ -351,10 +351,10 @@ h_k = \frac{\partial h_m}{\partial Y_k }
 \]
 \begin{align}
 \frac{\partial h_m}{\partial Y_k } &=  h_k^{id}
-+ (T \frac{\partial^2 a_m}{\partial T \partial Y_k}  - \frac{\partial a_m }{Y_k})
++ (T \frac{\partial^2 a_m}{\partial T \partial Y_k}  - \frac{\partial a_m }{\partial Y_k})
 \frac{1}{b_m} ln(1+ \frac{b_m}{\tau})
 -(T \frac{\partial a_m}{\partial T}  - a_m ) \left[ \frac{1}{b_m^2} ln(1+ \frac{b_m}{\tau})
-+ \frac{1}{b_m(\tau+b_m)}
+- \frac{1}{b_m(\tau+b_m)}
 \right ] \frac{\partial b_m}{\partial Y_k} \nonumber \\
 &+ \frac{a_m}{(\tau+b_m)^2}  \frac{\partial b_m}{\partial Y_k}
 - \frac{1}{\tau+b_m}  \frac{\partial a_m}{\partial Y_k}
@@ -371,10 +371,11 @@ h_k = \frac{\partial h_m}{\partial Y_k }
 For kinetics and transport need chemical potential. For that free energy is given by
 \begin{align}
 f &= \sum_i Y_i (e_i^{id} - T s_i^{id,*}) +  \sum_i \frac{Y_i R T}{W_i} ln (\frac{Y_i R T}{W_i \tau p^{st}})  \nonumber \\
-&+ \sum_i \frac{Y_i R T}{W_i} ln (\frac{\tau}{\tau-b_m}) - \frac{\partial a_m}{\partial T} \frac{1}{b_m}
+%  &+ \sum_i \frac{Y_i R T}{W_i} ln (\frac{\tau}{\tau-b_m}) - \frac{\partial a_m}{\partial T} \frac{1}{b_m}
+&+ \sum_i \frac{Y_i R T}{W_i} ln (\frac{\tau}{\tau-b_m}) -  a_m \frac{1}{b_m}
 ln (1+ \frac{b_m}{\tau})  \nonumber \\
  &= \sum_i Y_i (e_i^{id} - T s_i^{id,*}) +  \sum_i \frac{Y_i R T}{W_i} ln (\frac{Y_i R T}{W_i (\tau-b_m) p^{st}} )
-- \frac{\partial a_m}{\partial T} \frac{1}{b_m}
+- a_m \frac{1}{b_m}
 ln (1+ \frac{b_m}{\tau})  \nonumber 
 \end{align}
 Then
