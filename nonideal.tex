@@ -42,7 +42,7 @@
 \newcommand{\msd}[1]{{\bf[{\color{green}{MSD:  #1}}]}}
 \definecolor{drkgrn}{rgb}{0.043,0.341,0.2274}
 \newcommand{\rwg}[1]{{\bf[{\color{drkgrn}{RWG:  #1}}]}}
-
+\newcommand{\manu}[1]{{\bf[{\color{blue}{EM:  #1}}]}}
 
 \newcommand{\HeatFlux}{\boldsymbol{\mathcal{Q}}}
 \newcommand{\SpeciesFlux}{\boldsymbol{\mathcal{F}}}
@@ -100,7 +100,8 @@ April 19, 2017
       \msd{$c_v$ is required in (at least) two places: to compute the explicit timestep limit due to temperature diffusion, and to compute $T$ from $(e,Y)$.  The latter is done in the FUEGO-generated code, and uses a call to {\tt CKCVBS}}
     \item[SY] \sout{Generate plots of bulk and shear viscosity vs. T at multiple P (or vs. P at fixed T) from NIST database }\\
         \rwg{SY showed me these plots - upshot we seem to be fine for CH4-air and H2-air, for heavier fuels may need to revisit. If anyone would like to see them in this doc or elsewhere say so\ldots}
-    \item[SY] Contact EM to discuss what has been done w.r.t. reading in $T_c$, $P_c$ for species and interfacing with LJ potentials to estimate those not available
+    \item[SY] \sout{Contact EM to discuss what has been done w.r.t. reading in $T_c$, $P_c$ for species and interfacing with LJ potentials to estimate those not available}
+    \manu{EM has modified fuego in branch {\it fuego-work} of {\it PelePhysics}. Fuego is now creating a new routine in the $*.c$ file to provide the critical temperature as well as $a_i$, $b_i$ and acentric factor. There is also a dictionary with known values from NIST database instead of using formulas.}
     \item[HS] \sout{Set up branch for Fuego mods} \\
         \rwg{MSD did this: branch of {\it PelePhysics} is {\it fuego-work}}
     \item[SY] Implement the functionality in Section \ref{sec:api} pertaining to state thermodynamics; please update document with routine name for each when done
